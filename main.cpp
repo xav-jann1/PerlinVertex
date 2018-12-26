@@ -15,6 +15,7 @@
 #include "tools/glutils.hpp"
 
 // Outils:
+#include "tools/mat3.hpp"
 #include "tools/mat4.hpp"
 #include "tools/triangle_index.hpp"
 #include "tools/vec2.hpp"
@@ -23,6 +24,7 @@
 // Classes:
 #include "classes/Camera.hpp"
 #include "classes/Cube.hpp"
+#include "classes/Path.hpp"
 
 //using namespace std;
 
@@ -40,6 +42,7 @@ Camera camera;
 // Eléments de jeu:
 std::vector<Cube*> cubes;
 Cube player;
+Path path;
 
 // Contrôles: (TODO: dans un struct)
 bool left = false;
@@ -49,12 +52,10 @@ bool right = false;
 mat4 projection;
 
 // Chargement d'un cube sur la carte graphique:
-void loadCube() {
-  GLuint vbo = 0;
-  GLuint vboi = 0;
+void loadCube(float dim) {
+  GLuint vbo, vboi;
 
   // Tableau entrelacant coordonnees-normales:
-  float dim = 0.4;
   vec3 geometrie[] = {dim * vec3(-0.2f, -0.2f, -0.2f), vec3(0.0f, 0.0f, 0.0f),
                       dim * vec3(0.2f, -0.2f, -0.2f),  vec3(1.0f, 0.0f, 0.0f),
                       dim * vec3(0.2f, 0.2f, -0.2f),   vec3(0.0f, 1.0f, 0.0f),
@@ -140,6 +141,20 @@ static void init() {
 
   // Activation de la gestion de la profondeur:
   glEnable(GL_DEPTH_TEST);  PRINT_OPENGL_ERROR();
+
+
+  /**** Test Tube ****/
+
+  vec3 p1 = vec3(0,0,0);
+  vec3 p2 = vec3(1,0,1);
+  vec3 p3 = vec3(3,0,2);
+  path.pushPoint(p1);
+  path.pushPoint(p2);
+  path.pushPoint(p3);
+  path.setRenderProgram(shader_program_id);
+  path.setRenderRadius(1);
+  path.setRenderRes(10);
+
 }
 
 // Fonction d'affichage:
@@ -154,15 +169,17 @@ static void display_callback() {
   glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
-  loadCube();
+  loadCube(0.4);
   for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->render(shader_program_id);
   }
 
   // Affichage du joueur:
-  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
-  player.render(shader_program_id);
+  ///glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
+  //player.render(shader_program_id);
+  
 
+  path.render();
 
   // Changement de buffer d'affichage pour eviter un effet de scintillement
   glutSwapBuffers();
