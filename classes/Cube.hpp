@@ -15,7 +15,7 @@ class Cube
     //Constructeur
     //Cube(vec3 coord, mat4 rot, float dim);
     Cube();
-    void render(GLuint shader_program_id);
+    
 
     //Translation
     void translate(vec3 t);
@@ -37,7 +37,14 @@ class Cube
     vec3* getGeometrie();
     triangle_index* getIndex();
 
+    // Mise à jour de la position du cube:
     void update();
+
+    // Chargement d'un cube sur la carte graphique:
+    static void loadCube(float);
+
+    // Affichage du cube:
+    void render(GLuint shader_program_id);
 
 
     private:

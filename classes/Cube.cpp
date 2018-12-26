@@ -70,6 +70,62 @@ mat4 Cube::getMat4() {
 
 void Cube::update() { translateZ(m_speed); }
 
+// Chargement d'un cube sur la carte graphique:
+void Cube::loadCube(float dim) {
+  GLuint vbo, vboi;
+
+  // Tableau entrelacant coordonnees-normales:
+  vec3 geometrie[] = {dim * vec3(-0.2f, -0.2f, -0.2f), vec3(0.0f, 0.0f, 0.0f),
+                      dim * vec3(0.2f, -0.2f, -0.2f),  vec3(1.0f, 0.0f, 0.0f),
+                      dim * vec3(0.2f, 0.2f, -0.2f),   vec3(0.0f, 1.0f, 0.0f),
+                      dim * vec3(-0.2f, 0.2f, -0.2f),  vec3(1.0f, 1.0f, 0.0f),
+                      dim * vec3(-0.2f, -0.2f, 0.2f),  vec3(1.0f, 0.0f, 1.0f),
+                      dim * vec3(0.2f, -0.2f, 0.2f),   vec3(1.0f, 0.0f, 0.0f),
+                      dim * vec3(0.2f, 0.2f, 0.2f),    vec3(0.0f, 1.0f, 0.0f),
+                      dim * vec3(-0.2f, 0.2f, 0.2f),   vec3(1.0f, 1.0f, 0.0f)};
+
+  // Indice des triangles:
+  triangle_index tri0 = triangle_index(0, 1, 2);
+  triangle_index tri1 = triangle_index(0, 2, 3);
+  triangle_index tri2 = triangle_index(1, 2, 5);
+  triangle_index tri3 = triangle_index(5, 2, 6);
+  triangle_index tri4 = triangle_index(0, 4, 3);
+  triangle_index tri5 = triangle_index(4, 3, 7);
+  triangle_index tri6 = triangle_index(4, 7, 5);
+  triangle_index tri7 = triangle_index(5, 7, 6);
+  triangle_index tri8 = triangle_index(2, 3, 6);
+  triangle_index tri9 = triangle_index(3, 6, 7);
+  triangle_index tri10 = triangle_index(0, 1, 5);
+  triangle_index tri11 = triangle_index(0, 5, 4);
+
+  triangle_index index[] = {tri0, tri1, tri2, tri3, tri4,  tri5,
+                            tri6, tri7, tri8, tri9, tri10, tri11};
+
+  // Attribution d'un buffer de donnees (1 indique la création d'un buffer):
+  glGenBuffers(1, &vbo);  PRINT_OPENGL_ERROR();
+  // Affectation du buffer courant:
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);  PRINT_OPENGL_ERROR();
+  // Copie des donnees des sommets sur la carte graphique:
+  glBufferData(GL_ARRAY_BUFFER, sizeof(geometrie), geometrie, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
+
+  // Active l'utilisation des données de positioncenter_views:
+  glEnableClientState(GL_VERTEX_ARRAY);  PRINT_OPENGL_ERROR();
+  // Indique que le buffer courant (désigné par la variable vbo) est utilisé pour les positions de sommets:
+  glVertexPointer(3, GL_FLOAT, 2 * sizeof(vec3), 0);  PRINT_OPENGL_ERROR();
+
+  // Active l'utilisation des données de couleurs:
+  glEnableClientState(GL_COLOR_ARRAY);  PRINT_OPENGL_ERROR();
+  // Indique que le buffer courant (désigné par la variable vbo) est utilisé pour les couleurs:
+  glColorPointer(3, GL_FLOAT, 2 * sizeof(vec3), buffer_offset(sizeof(vec3)));  PRINT_OPENGL_ERROR();
+
+  // Attribution d'un autre buffer de données:
+  glGenBuffers(1, &vboi);  PRINT_OPENGL_ERROR();
+  // Affectation du buffer courant (buffer d'indice):
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboi);  PRINT_OPENGL_ERROR();
+  // Copie des indices sur la carte graphique:
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
+}
+
 void Cube::render(GLuint shader_program_id) {
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "rotation"), 1, false, pointeur(getMat4()));  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(shader_program_id, "rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();

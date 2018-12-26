@@ -51,63 +51,8 @@ bool right = false;
 // Matrice de projection:
 mat4 projection;
 
-// Chargement d'un cube sur la carte graphique:
-void loadCube(float dim) {
-  GLuint vbo, vboi;
 
-  // Tableau entrelacant coordonnees-normales:
-  vec3 geometrie[] = {dim * vec3(-0.2f, -0.2f, -0.2f), vec3(0.0f, 0.0f, 0.0f),
-                      dim * vec3(0.2f, -0.2f, -0.2f),  vec3(1.0f, 0.0f, 0.0f),
-                      dim * vec3(0.2f, 0.2f, -0.2f),   vec3(0.0f, 1.0f, 0.0f),
-                      dim * vec3(-0.2f, 0.2f, -0.2f),  vec3(1.0f, 1.0f, 0.0f),
-                      dim * vec3(-0.2f, -0.2f, 0.2f),  vec3(1.0f, 0.0f, 1.0f),
-                      dim * vec3(0.2f, -0.2f, 0.2f),   vec3(1.0f, 0.0f, 0.0f),
-                      dim * vec3(0.2f, 0.2f, 0.2f),    vec3(0.0f, 1.0f, 0.0f),
-                      dim * vec3(-0.2f, 0.2f, 0.2f),   vec3(1.0f, 1.0f, 0.0f)};
-
-  // Indice des triangles:
-  triangle_index tri0 = triangle_index(0, 1, 2);
-  triangle_index tri1 = triangle_index(0, 2, 3);
-  triangle_index tri2 = triangle_index(1, 2, 5);
-  triangle_index tri3 = triangle_index(5, 2, 6);
-  triangle_index tri4 = triangle_index(0, 4, 3);
-  triangle_index tri5 = triangle_index(4, 3, 7);
-  triangle_index tri6 = triangle_index(4, 7, 5);
-  triangle_index tri7 = triangle_index(5, 7, 6);
-  triangle_index tri8 = triangle_index(2, 3, 6);
-  triangle_index tri9 = triangle_index(3, 6, 7);
-  triangle_index tri10 = triangle_index(0, 1, 5);
-  triangle_index tri11 = triangle_index(0, 5, 4);
-
-  triangle_index index[] = {tri0, tri1, tri2, tri3, tri4,  tri5,
-                            tri6, tri7, tri8, tri9, tri10, tri11};
-
-  // Attribution d'un buffer de donnees (1 indique la création d'un buffer):
-  glGenBuffers(1, &vbo);  PRINT_OPENGL_ERROR();
-  // Affectation du buffer courant:
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);  PRINT_OPENGL_ERROR();
-  // Copie des donnees des sommets sur la carte graphique:
-  glBufferData(GL_ARRAY_BUFFER, sizeof(geometrie), geometrie, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
-
-  // Active l'utilisation des données de positioncenter_views:
-  glEnableClientState(GL_VERTEX_ARRAY);  PRINT_OPENGL_ERROR();
-  // Indique que le buffer courant (désigné par la variable vbo) est utilisé pour les positions de sommets:
-  glVertexPointer(3, GL_FLOAT, 2 * sizeof(vec3), 0);  PRINT_OPENGL_ERROR();
-
-  // Active l'utilisation des données de couleurs:
-  glEnableClientState(GL_COLOR_ARRAY);  PRINT_OPENGL_ERROR();
-  // Indique que le buffer courant (désigné par la variable vbo) est utilisé pour les couleurs:
-  glColorPointer(3, GL_FLOAT, 2 * sizeof(vec3), buffer_offset(sizeof(vec3)));  PRINT_OPENGL_ERROR();
-
-  // Attribution d'un autre buffer de données:
-  glGenBuffers(1, &vboi);  PRINT_OPENGL_ERROR();
-  // Affectation du buffer courant (buffer d'indice):
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboi);  PRINT_OPENGL_ERROR();
-  // Copie des indices sur la carte graphique:
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
-}
-
-// Génération d'un objet Cube:
+// Génération d'un objet Cube: (TODO: à intégrer dans le constructeur de Cube)
 Cube* generateCube() {
   Cube* c = new Cube();
   float angle = ((float)rand() / (RAND_MAX)) * 2 * M_PI;
@@ -169,7 +114,7 @@ static void display_callback() {
   glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
-  loadCube(0.4);
+  Cube::loadCube(0.4);
   for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->render(shader_program_id);
   }
@@ -178,7 +123,7 @@ static void display_callback() {
   ///glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
   //player.render(shader_program_id);
   
-
+  // Affichage du tube:
   path.render();
 
   // Changement de buffer d'affichage pour eviter un effet de scintillement
@@ -194,7 +139,7 @@ void gameUpdate() {
     cubes[i]->update();
   }
 
-  // Création nouveaux cubes:
+  // Création d'un nouveau cube toutes les <newCubeIn> ms:
   if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
     prevCreation = glutGet(GLUT_ELAPSED_TIME);
     cubes.push_back(generateCube());
