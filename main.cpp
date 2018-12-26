@@ -93,12 +93,15 @@ static void init() {
   vec3 p1 = vec3(0,0,0);
   vec3 p2 = vec3(1,0,1);
   vec3 p3 = vec3(3,0,2);
+  vec3 p4 = vec3(5,0,2);
+  //path.setRenderRadius(1);
+  //path.setRenderRes(10);
   path.pushPoint(p1);
   path.pushPoint(p2);
   path.pushPoint(p3);
+  path.setRenderRadius(2);
+  path.pushPoint(p4);
   path.setRenderProgram(shader_program_id);
-  path.setRenderRadius(1);
-  path.setRenderRes(10);
 
 }
 
@@ -204,6 +207,14 @@ static void keyboard_callback(unsigned char key, int, int) {
         cubes[i]->rotateY(-d_angle * (i + 1));
       }
       break;
+    
+    // Path:
+    case 'b':
+      path.updateRadius(-0.01);
+      break;
+    case 'n':
+      path.updateRadius(0.01);
+      break;
   }
 }
 
@@ -304,7 +315,7 @@ int main(int argc, char** argv) {
   // Lancement de la boucle (infinie) d'affichage de la fenetre
   glutMainLoop();
 
-  // Plus rien n'est execute après cela
+  // Plus rien n'est executé après cela
 
   return 0;
 }
