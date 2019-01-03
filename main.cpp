@@ -25,9 +25,9 @@
 #include "classes/Camera.hpp"
 #include "classes/Cube.hpp"
 #include "classes/Path.hpp"
+#include "classes/Perlin.hpp"
 
 //using namespace std;
-
 
 /*****************************************************************************\
  * Variables globales
@@ -43,6 +43,8 @@ Camera camera;
 std::vector<Cube*> cubes;
 Cube player;
 Path path;
+Perlin perlinX, perlinY, perlinZ;  // Générateur de valeurs aléatoires
+vec3 p00;  // Test Perlin
 
 // Contrôles: (TODO: dans un struct)
 bool left = false;
@@ -67,7 +69,6 @@ Cube* generateCube() {
  * init                                                                      *
 \*****************************************************************************/
 static void init() {
-
   // Initialisation de la caméra:
   camera.translation_y(1.0f);
   camera.translation_z(-1.0f);
@@ -87,22 +88,34 @@ static void init() {
   // Activation de la gestion de la profondeur:
   glEnable(GL_DEPTH_TEST);  PRINT_OPENGL_ERROR();
 
+  
+  /**** Test Perlin ****/
+  int nCount = 10;
 
+  // Ajoute les points au chemin :
+  vec3 p0 = vec3(perlinX.getNext(), perlinY.getNext(), perlinZ.getNext());
+  path.pushPoint((p0 - p0) * 20);
+  for (int i = 1; i < nCount; i++) {
+    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), perlinZ.getNext());
+    path.pushPoint((p - p0) * 20);
+  }
+
+  p00 = p0;
+  
   /**** Test Tube ****/
-
-  vec3 p1 = vec3(0,0,0);
-  vec3 p2 = vec3(1,0,1);
-  vec3 p3 = vec3(3,0,2);
-  vec3 p4 = vec3(5,0,2);
-  //path.setRenderRadius(1);
-  //path.setRenderRes(10);
+  /*vec3 p1 = vec3(0, 0, 2);
+  vec3 p2 = vec3(0, 0, -20);
+  // vec3 p3 = vec3(3,0,2);
+  // vec3 p4 = vec3(5,0,2);
+  // path.setRenderRadius(1);
+  // path.setRenderRes(10);
   path.pushPoint(p1);
-  path.pushPoint(p2);
-  path.pushPoint(p3);
-  path.setRenderRadius(2);
-  path.pushPoint(p4);
-  path.setRenderProgram(shader_program_id);
+  path.pushPoint(p2);*/
+  // path.pushPoint(p3);
+  // path.setRenderRadius(2);
+  // path.pushPoint(p4);
 
+  path.setRenderProgram(shader_program_id);
 }
 
 // Fonction d'affichage:
@@ -122,20 +135,26 @@ static void display_callback() {
     cubes[i]->render(shader_program_id);
   }
 
-  // Affichage du joueur:
-  ///glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
-  //player.render(shader_program_id);
-  
   // Affichage du tube:
   path.render();
+
+  // Affichage du joueur:
+  Cube::loadCube(0.4);
+  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
+  player.render(shader_program_id);
 
   // Changement de buffer d'affichage pour eviter un effet de scintillement
   glutSwapBuffers();
 }
 
 // Gestion des éléments du jeu:
-int newCubeIn = 100; // en ms
+int newCubeIn = 500; // en ms
 int prevCreation = 0;
+
+// Test Perlin
+int counter = 0;
+vec3 pPrev = vec3();
+
 void gameUpdate() {
   // maj de la position des cubes:
   for (unsigned int i = 0; i < cubes.size(); i++) {
@@ -145,7 +164,15 @@ void gameUpdate() {
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
   if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
     prevCreation = glutGet(GLUT_ELAPSED_TIME);
-    cubes.push_back(generateCube());
+    // cubes.push_back(generateCube());
+
+    /*** Test Perlin ***/
+    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
+    std::cout << "dp " << p - pPrev << std::endl;
+    path.pushPoint((p - p00) * 20);
+
+    counter++;
+    pPrev = p;
   }
 
   // Déplacement du joueur <=> déplacement de la caméra:
@@ -207,7 +234,7 @@ static void keyboard_callback(unsigned char key, int, int) {
         cubes[i]->rotateY(-d_angle * (i + 1));
       }
       break;
-    
+
     // Path:
     case 'b':
       path.updateRadius(-0.01);

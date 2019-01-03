@@ -11,7 +11,7 @@ uniform vec4 rotation_center;
 uniform mat4 projection;
 
 varying vec4 colors;
-
+varying vec3 coordonnee_3d;
 
 //Un Vertex Shader minimaliste
 void main (void)
@@ -28,4 +28,8 @@ void main (void)
 
     //position dans l'espace ecran
     gl_Position = p;
+
+    // Les coordonnees 3D du sommet:
+    coordonnee_3d = gl_Vertex.xyz;
+
 }
