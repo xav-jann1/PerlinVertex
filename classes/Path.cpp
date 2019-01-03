@@ -162,20 +162,40 @@ void Path::addRender(int idx) {
 
 // Ajoute les indices pour modéliser un tube entre le point i et i-1 du chemin:
 void Path::addTubeIndices(int i) {
-  // Ajoute les triangles, entre le triangle précédent et en cours, pour former le tube:
+  // Indices du premier sommet de chaque cercle:
   int iCercle1 = (i - 1) * (m_render_res + 1) + 1;  // Indice du premier point du cercle 1 (précédent)
   int iCercle2 = iCercle1 + m_render_res + 1;       // Indice du premier point du cercle 2 (en cours)
+
+  /** Adaption d'indices **/
+
+  // Pour corriger une erreur d'orientation des deux cercles
+  // (si les premiers indices des deux cercles ne sont pas juste en face) 
+  // il faut adapter, si nécessaire, les indices pour créer les triangles:
+
+  // Calcul la distance entre les points supposés les plus proches,
+  // et les points supposé les plus éloignés, entre le Cercle1 et Cercle2:
+  float d1 = norm(m_render_sommets[iCercle1] - m_render_sommets[iCercle2]);  // Supposé les plus proches
+  float d2 = norm(m_render_sommets[iCercle1 + m_render_res / 2] - m_render_sommets[iCercle2]);  // Supposé les plus éloignés
+
+  // Pour décaler, si nécessaire les indices pour créer les triangles:
+  int di = 0;
+  // Si les points les plus éloignés sont en réalité les plus proches:
+  if (d2 < d1) di = m_render_res / 2;  // Décalage des indices
+
+  /** Ajout des indices **/
+
+  // Ajoute les triangles, entre le triangle précédent et en cours, pour former le tube:
   for (int j = 0; j < m_render_res - 1; ++j) {
-    m_render_indices.push_back(triangle_index(iCercle1 + j, iCercle2 + j, iCercle2 + j + 1));
-    m_render_indices.push_back(triangle_index(iCercle1 + j, iCercle1 + j + 1, iCercle2 + j + 1));
+    m_render_indices.push_back(triangle_index(iCercle1 + j, iCercle2 + (j + di) % m_render_res, iCercle2 + (j + 1 + di) % m_render_res));
+    m_render_indices.push_back(triangle_index(iCercle1 + j, iCercle1 + j + 1, iCercle2 + (j + 1 + di) % m_render_res));
   }
-  m_render_indices.push_back(triangle_index(iCercle1, iCercle1 + m_render_res - 1, iCercle2));
-  m_render_indices.push_back(triangle_index(iCercle1 + m_render_res - 1, iCercle2, iCercle2 + m_render_res - 1));
+  m_render_indices.push_back(triangle_index(iCercle1, iCercle1 + m_render_res - 1, iCercle2 + di));
+  m_render_indices.push_back(triangle_index(iCercle1 + m_render_res - 1, iCercle2 + di, iCercle2 + (m_render_res - 1 + di) % m_render_res));
 
   return;
 }
 
-// Recommence le pré-rendu dépuis le début:
+// Recommence le pré-rendu depuis le début:
 void Path::resetRender() {
   // S'il n'y a pas assez de points:
   if (m_points.size() < 2) {

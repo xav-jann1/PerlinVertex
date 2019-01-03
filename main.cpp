@@ -167,12 +167,14 @@ void gameUpdate() {
     // cubes.push_back(generateCube());
 
     /*** Test Perlin ***/
-    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
+    /*vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
     std::cout << "dp " << p - pPrev << std::endl;
     path.pushPoint((p - p00) * 20);
 
+    std::cout << std::endl;
+
     counter++;
-    pPrev = p;
+    pPrev = p;*/
   }
 
   // Déplacement du joueur <=> déplacement de la caméra:
@@ -241,6 +243,21 @@ static void keyboard_callback(unsigned char key, int, int) {
       break;
     case 'n':
       path.updateRadius(0.01);
+      break;
+
+
+    // Perlin:
+    case 'r':
+      /*** Test Perlin ***/
+      vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
+      std::cout << "p " << p << std::endl;
+      std::cout << "dp " << p - pPrev << std::endl;
+      path.pushPoint((p - p00) * 20 + vec3(2,2,2));
+
+      std::cout << std::endl;
+
+      counter++;
+      pPrev = p;
       break;
   }
 }
