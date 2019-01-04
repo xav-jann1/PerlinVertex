@@ -128,9 +128,9 @@ static void display_callback() {
   glClearColor(0.5f, 0.6f, 0.9f, 1.0f);  PRINT_OPENGL_ERROR();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  PRINT_OPENGL_ERROR();
 
-  camera.setX(cube.getCoord().x);
-  camera.setY(cube.getCoord().y);
-  camera.setZ(cube.getCoord().z);
+  //camera.setX(cube.getCoord().x);
+  //camera.setY(cube.getCoord().y);
+  //camera.setZ(cube.getCoord().z - 0.5);
 
   //camera.print();
 
@@ -149,8 +149,8 @@ static void display_callback() {
     cubes[i]->render(shader_program_id);
   }*/
 
-  //Cube::loadCube(0.4);
-  //cube.render(shader_program_id);
+  Cube::loadCube(0.4);
+  cube.render(shader_program_id);
 
   // Affichage du tube:
   path.render();
@@ -210,7 +210,8 @@ void gameUpdate() {
  * keyboard_callback                                                         *
 \*****************************************************************************/
 static void keyboard_callback(unsigned char key, int, int) {
-  float d_angle = 0.001f;
+  //float d_angle = 0.001f;
+  float d_angle = 0.01f;
   float dz = 0.1f;
 
   // Quitte le programme si on appuie sur les touches 'q', 'Q', ou 'echap'

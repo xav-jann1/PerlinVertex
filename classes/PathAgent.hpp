@@ -21,6 +21,7 @@ class PathAgent {
   void updateSpeed(float);
   void setAngle(float);
   void setAngleSpeed(float);
+  void setOffset(float);
   void setPointsAB(int);
 
   // Détermine le vecteur normalisé reliant le point A au point B:

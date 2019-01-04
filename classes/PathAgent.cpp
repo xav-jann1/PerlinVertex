@@ -17,7 +17,8 @@ PathAgent::PathAgent(Path* path) {
   // Paramètres de l'agent:
   setAngle(0);
   setSpeed(1);
-  setAngleSpeed(0);
+  setAngleSpeed(1);
+  setOffset(0);
 
   // Variables pour le déplacement de l'agent:
   m_iteratorA = 0;
@@ -45,6 +46,8 @@ void PathAgent::setSpeed(float speed) { m_speed = speed; }
 // Modification relative de la vitesse de translation:
 void PathAgent::updateSpeed(float dspeed) { m_speed += dspeed; }
 
+void PathAgent::setOffset(float offset) { m_tube_offset = offset; }
+
 // Génère le vecteur normalisé dirigé du point A vers le point B:
 void PathAgent::updateDirection() {
   m_direction = normalize(m_pointB - m_pointA);
@@ -71,7 +74,7 @@ void PathAgent::setPointsAB(int i) {
 vec3 PathAgent::getPos() { return m_tube_position; }
 
 // Direction:
-vec3 PathAgent::getDirection() { return m_direction;}
+vec3 PathAgent::getDirection() { return m_direction; }
 
 /**
  * Méthodes:
@@ -166,7 +169,14 @@ bool PathAgent::update(int path_points_deleted) {
   }
 
   /** Position de l'agent dans le tube **/
-  // TODO...
+
+  // Vecteur perpandiculaire à la direction de l'agent:
+  vec3 ref = vec3(1, 0, 0);
+  vec3 perpandiculaire = cross(m_direction, ref);
+
+  vec3 angle_pos =
+      rotateVectorAroundAxis(perpandiculaire, m_direction, m_path_angle);
+
   /* m_tube_position = 0;
 
   // Position au bord du tube, sans rotation:
@@ -177,7 +187,8 @@ bool PathAgent::update(int path_points_deleted) {
   position = rotation_z * position;*/
 
   // Ajoute la translation:
-  m_tube_position = m_path_position;
+  m_tube_position = m_path_position + normalize(angle_pos) *
+                                          (m_path->getRadius() + m_tube_offset);
 
   return false;
 }

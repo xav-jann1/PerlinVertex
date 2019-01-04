@@ -55,4 +55,7 @@ vec3 operator*(float s, const vec3& v0);
 /** Division par un scalaire */
 vec3 operator/(const vec3& v0, float s);
 
+// Rotation d'un vecteur autour d'un axe:
+vec3 rotateVectorAroundAxis(vec3 vec, vec3 axis, float angle);
+
 #endif

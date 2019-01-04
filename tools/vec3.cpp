@@ -1,8 +1,14 @@
 
+// Header:
 #include "vec3.hpp"
+
+// Librairies:
 #include <cassert>
 #include <cmath>
 #include <iostream>
+
+// Outil:
+#include "mat3.hpp"
 
 vec3::vec3() : x(0.0f), y(0.0f), z(0.0f) {}
 
@@ -86,4 +92,37 @@ vec3 operator/(const vec3& v0, float s) {
   vec3 temp = v0;
   temp /= s;
   return temp;
+}
+
+// Rotation d'un vecteur autour d'un axe:
+//   Inspiré de : 'Rotating vectors in space and high precision in C++'
+//      https://stackoverflow.com/questions/45591017/rotating-vectors-in-space-and-high-precision-in-c
+vec3 rotateVectorAroundAxis(vec3 vec, vec3 axis, float angle) {
+  // Normalisation du vecteur de l'axe de rotation:
+  axis = normalize(axis);
+
+  // Valeur constantes:
+  float cos = std::cos(angle), sin = std::sin(angle);
+  float mcos = 1 - cos;
+
+  // Matrice de rotation:
+  mat3 rotation;
+
+  // Remplie la matrice de rotation:
+  rotation(0, 0) = cos + axis.x * axis.x * mcos;
+  rotation(1, 0) = axis.x * axis.y * mcos - axis.z * sin;
+  rotation(2, 0) = axis.x * axis.z * mcos - axis.y * sin;
+
+  rotation(0, 1) = axis.x * axis.y * mcos + axis.z * sin;
+  rotation(1, 1) = cos + axis.y * axis.y * mcos;
+  rotation(2, 1) = axis.x * axis.z * mcos - axis.x * sin;
+
+  rotation(0, 2) = axis.x * axis.z * mcos - axis.y * sin;
+  rotation(1, 2) = axis.z * axis.y * mcos - axis.x * sin;
+  rotation(2, 2) = cos - axis.z * axis.z * mcos;
+
+  // Rotation du vecteur:
+  vec = rotation * vec;
+
+  return vec;
 }
