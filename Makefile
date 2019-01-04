@@ -3,10 +3,11 @@ LDFLAGS = -lm -lglut -lGLEW -lGLU -lGL -pthread
 
 all: executable
 
-executable: main.o tools/glutils.o tools/mat3.o tools/mat4.o tools/vec2.o tools/vec3.o tools/triangle_index.o classes/Camera.o classes/Cube.o classes/Path.o classes/PathAgent.o classes/Perlin.o
+executable: main.o tools/callbacks.o tools/glutils.o tools/mat3.o tools/mat4.o tools/vec2.o tools/vec3.o tools/triangle_index.o classes/Camera.o classes/Cube.o classes/Path.o classes/PathAgent.o classes/Perlin.o
 	g++ $^ -o executable $(LDFLAGS)
 
-main.o: main.cpp tools/glutils.hpp tools/mat3.hpp tools/mat4.hpp tools/vec3.hpp tools/vec2.hpp tools/triangle_index.hpp classes/Camera.hpp classes/Cube.hpp classes/Path.hpp classes/PathAgent.hpp classes/Perlin.hpp
+main.o: main.cpp tools/callbacks.hpp tools/glutils.hpp tools/mat3.hpp tools/mat4.hpp tools/vec3.hpp tools/vec2.hpp tools/triangle_index.hpp classes/Camera.hpp classes/Cube.hpp classes/Path.hpp classes/PathAgent.hpp classes/Perlin.hpp
+callbacks.o: tools/callbacks.cpp tools/callbacks.hpp
 glutils.o: tools/glutils.cpp tools/glutils.hpp
 mat3.o: tools/mat3.cpp tools/mat3.hpp
 mat4.o: tools/mat4.cpp tools/mat4.hpp

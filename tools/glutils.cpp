@@ -8,9 +8,6 @@
  *
 \*****************************************************************************/
 
-
-
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -20,10 +17,51 @@
 
 #define GLEW_STATIC 1
 #include <GL/glew.h>
-
+#include <GL/glut.h>
 #include <GL/gl.h>
 
+#include "callbacks.hpp"
+
 #include "glutils.hpp"
+
+
+/*****************************************************************************\
+ * Initialisation de Glut et Glew                                            *
+\*****************************************************************************/
+void initGlut(int argc, char** argv) {
+
+  // initialisation
+  glutInit(&argc, argv);
+
+  // TODO: intégrer l'initialisation de GLUT dans une fonction ou un objet
+
+  // Mode d'affichage (couleur, gestion de profondeur, ...)
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+
+  // Taille de la fenêtre à l'ouverture:
+  glutInitWindowSize(800, 600);
+
+  // Titre de la fenetre:
+  glutCreateWindow("PerlinVertex");
+
+  // Fonction de la boucle d'affichage:
+  glutDisplayFunc(draw);
+
+  // Fonction de gestion du clavier:
+  glutKeyboardFunc(keyboard_callback);
+
+  // Fonction de gestion du clavier:
+  glutSpecialUpFunc(keyboardUp_callback);
+
+  // Fonction des touches speciales du clavier (fleches directionnelles)
+  glutSpecialFunc(special_callback);
+
+  // Fonction d'appel d'affichage en chaine:
+  glutTimerFunc(25, timer_callback, 0);
+
+  // Initialisation des fonctions OpenGL:
+  glewInit();
+}
 
 /*****************************************************************************\
  * print_opengl_error                                                        *

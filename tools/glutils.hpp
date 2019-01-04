@@ -17,11 +17,18 @@ etc)
 
 #define GLEW_STATIC 1
 #include <GL/gl.h>
+
 #include <GL/glew.h>
 
 // Macro permettant la recherche et l'affichage des erreurs OpenGL, indique le
 // fichier et la ligne au moment de l'appel.
 #define PRINT_OPENGL_ERROR() print_opengl_error(__FILE__, __LINE__)
+
+// Affichage:
+extern void draw();
+
+// Initialisation de Glut et Glew:
+void initGlut(int argc, char** argv);
 
 // Affichage des erreurs OpenGL
 bool print_opengl_error(const char *file, int line);
