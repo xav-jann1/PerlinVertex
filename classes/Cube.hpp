@@ -1,71 +1,71 @@
-#ifndef DEF_CUBE
-#define DEF_CUBE
+#ifndef CUBE_H
+#define CUBE_H
 
+// Librairies:
 #include <iostream>
 #include <string>
 
-#include "../tools/vec3.hpp"
+// Outils:
 #include "../tools/mat4.hpp"
 #include "../tools/triangle_index.hpp"
+#include "../tools/vec3.hpp"
 
-class Cube
-{
-    public:
+// Classes:
+#include "Path.hpp"
+#include "PathAgent.hpp"
 
-    //Constructeur
-    //Cube(vec3 coord, mat4 rot, float dim);
-    Cube();
-    
+class Cube : public PathAgent {
+ public:
+  // Constructeur:
+  Cube(Path*);
 
-    //Translation
-    void translate(vec3 t);
-    void translateX(float x);
-    void translateY(float y);
-    void translateZ(float z);
+  // Translations:
+  void translate(vec3 t);
+  void translateX(float x);
+  void translateY(float y);
+  void translateZ(float z);
 
-    //Rotation
-    void rotateX(float theta);
-    void rotateY(float theta);
-    void rotateZ(float theta);
+  // Rotations:
+  void rotateX(float theta);
+  void rotateY(float theta);
+  void rotateZ(float theta);
 
-    //Getters
-    mat4 getMat4();
-    vec3 getCoord();
-    float getX();
-    float getY();
-    float getZ();
-    vec3* getGeometrie();
-    triangle_index* getIndex();
+  // Getters:
+  mat4 getMat4();
+  vec3 getCoord();
+  float getX();
+  float getY();
+  float getZ();
+  vec3* getGeometrie();
+  triangle_index* getIndex();
 
-    // Mise à jour de la position du cube:
-    void update();
+  // Mise à jour de la position du cube:
+  bool update(int path_points_deleted = 0);
 
-    // Chargement d'un cube sur la carte graphique:
-    static void loadCube(float);
+  // Chargement d'un cube sur la carte graphique:
+  static void loadCube(float);
 
-    // Affichage du cube:
-    void render(GLuint shader_program_id);
+  // Affichage du cube:
+  void render(GLuint shader_program_id);
 
+ private:
+  // Paramètre du cube:
+  float m_dim;
+  
+  // Initialisations:
+  void initPoints();
+  void initColors();
 
-    private:
-    //Methodes privees
-    void initPoints();
-    void initColors();
+  // Transformation:
+  vec3 m_coord;
+  vec3 m_rot_center;
+  float m_angleX, m_angleY, m_angleZ;
 
-    //Dimension
-    float m_dim;
-    float m_speed;
-
-    //Transformation
-    vec3 m_coord;
-    vec3 m_rot_center;
-    float m_angleX, m_angleY, m_angleZ;
-
-    //Donnees GPU
-    vec3 m_points[8];
-    //vec3[8] normales;
-    vec3 m_colors[8];
-    triangle_index m_index[8];
+  // Données GPU:
+  vec3 m_points[8];
+  // vec3[8] normales;
+  vec3 m_colors[8];
+  triangle_index m_index[8];
 };
 
 #endif

@@ -1,29 +1,85 @@
-#include <stdlib.h>
-
-#include <GL/glew.h>
-#include <GL/glut.h>
-
-#include "../tools/glutils.hpp"
-
 // Header:
 #include "Cube.hpp"
 
+// Librairies:
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <stdlib.h>
+
+// Outil:
+#include "../tools/glutils.hpp"
+
 using namespace std;
 
-Cube::Cube() {
-  m_dim = 1.0f;
-  m_speed = 0.1f;
-  m_coord = vec3(0.0f, 0.0f, 0.0f);
+// Constructeur:
+Cube::Cube(Path* path) : PathAgent(path) {
+  // Paramètres du cube:
+  m_dim = 1.0f;                      // Taille
+  m_coord = vec3(0.0f, 0.0f, 0.0f);  // Position
+
+  // Rotations:
   m_angleX = 0.0f;
   m_angleY = 0.0f;
   m_angleZ = 0.0f;
   m_rot_center = 0.5 * vec3(m_dim, m_dim, m_dim);
+
+  // Initialisation points et couleurs du cube:
   Cube::initPoints();
   Cube::initColors();
 }
 
 vec3 Cube::getCoord() { return m_coord; }
 
+/**
+ * Setters:
+ */
+
+// Translations:
+void Cube::translate(vec3 t) { m_coord += t; }
+void Cube::translateX(float x) { m_coord.x += x; }
+void Cube::translateY(float y) { m_coord.y += y; }
+void Cube::translateZ(float z) { m_coord.z += z; }
+
+// Rotations:
+void Cube::rotateX(float theta) { m_angleX += theta; }
+void Cube::rotateY(float theta) { m_angleY += theta; }
+void Cube::rotateZ(float theta) { m_angleZ += theta; }
+
+/**
+ * Getter:
+ */
+
+// Matrice de rotation du cube:
+mat4 Cube::getMat4() {
+  mat4 rotation_x = matrice_rotation(m_angleX, 1.0f, 0.0f, 0.0f);
+  mat4 rotation_y = matrice_rotation(m_angleY, 0.0f, 1.0f, 0.0f);
+  mat4 rotation_z = matrice_rotation(m_angleZ, 0.0f, 0.0f, 1.0f);
+  mat4 rotation = rotation_x * rotation_y * rotation_z;
+  return rotation;
+}
+
+/**
+ * Mise à jour de la position du cube:
+ * @param int path_points_deleted  Nombre de points supprimé du chemin depuis la
+ *                                 dernière mise à jour de l'agent
+ * @return bool canDelete  Averti si le cube peut être supprimé
+ *                         (car en dehors du chemin)
+ */
+bool Cube::update(int path_points_deleted) {
+  // Mise à jour de la position du cube sur le chemin:
+  bool canDelete = PathAgent::update(path_points_deleted);
+
+  // Récupère la nouvelle position de l'agent: (TODO: à enlever)
+  m_coord = PathAgent::getPos();
+
+  return canDelete;
+}
+
+/**
+ * Méthodes:
+ */
+
+// Points du cube:
 void Cube::initPoints() {
   m_points[0] = vec3(-0.2f, -0.2f, -0.2f);
   m_points[1] = vec3(0.2f, -0.2f, -0.2f);
@@ -35,6 +91,7 @@ void Cube::initPoints() {
   m_points[7] = vec3(-0.2f, 0.2f, 0.2f);
 }
 
+// Couleurs de chaque point du cube:
 void Cube::initColors() {
   m_colors[0] = vec3(0.0f, 0.0f, 0.0f);
   m_colors[1] = vec3(1.0f, 0.0f, 0.0f);
@@ -45,30 +102,6 @@ void Cube::initColors() {
   m_colors[6] = vec3(0.0f, 1.0f, 0.0f);
   m_colors[7] = vec3(1.0f, 1.0f, 0.0f);
 }
-
-void Cube::translate(vec3 t) { m_coord += t; }
-
-void Cube::translateX(float x) { m_coord.x += x; }
-
-void Cube::translateY(float y) { m_coord.y += y; }
-
-void Cube::translateZ(float z) { m_coord.z += z; }
-
-void Cube::rotateX(float theta) { m_angleX += theta; }
-
-void Cube::rotateY(float theta) { m_angleY += theta; }
-
-void Cube::rotateZ(float theta) { m_angleZ += theta; }
-
-mat4 Cube::getMat4() {
-  mat4 rotation_x = matrice_rotation(m_angleX, 1.0f, 0.0f, 0.0f);
-  mat4 rotation_y = matrice_rotation(m_angleY, 0.0f, 1.0f, 0.0f);
-  mat4 rotation_z = matrice_rotation(m_angleZ, 0.0f, 0.0f, 1.0f);
-  mat4 rotation = rotation_x * rotation_y * rotation_z;
-  return rotation;
-}
-
-void Cube::update() { translateZ(m_speed); }
 
 // Chargement d'un cube sur la carte graphique:
 void Cube::loadCube(float dim) {

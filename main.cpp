@@ -40,11 +40,13 @@ GLuint shader_program_id;
 Camera camera;
 
 // Eléments de jeu:
-std::vector<Cube*> cubes;
-Cube player;
+//std::vector<Cube*> cubes;
+//Cube player;
 Path path;
 Perlin perlinX, perlinY, perlinZ;  // Générateur de valeurs aléatoires
 vec3 p00;  // Test Perlin
+Cube cube(&path); // Test PathAgent
+int path_points_deleted = 0;
 
 // Contrôles: (TODO: dans un struct)
 bool left = false;
@@ -56,7 +58,7 @@ mat4 projection;
 
 // Génération d'un objet Cube: (TODO: à intégrer dans le constructeur de Cube)
 Cube* generateCube() {
-  Cube* c = new Cube();
+  Cube* c = new Cube(&path);
   float angle = ((float)rand() / (RAND_MAX)) * 2 * M_PI;
   c->translateZ(-20.0f);
   c->rotateZ(angle);
@@ -65,6 +67,10 @@ Cube* generateCube() {
   return c;
 }
 
+// Test Perlin
+int counter = 1;
+vec3 pPrev = vec3();
+
 /*****************************************************************************\
  * init                                                                      *
 \*****************************************************************************/
@@ -72,17 +78,17 @@ static void init() {
   // Initialisation de la caméra:
   camera.translation_y(1.0f);
   camera.translation_z(-1.0f);
-  camera.rotate_x(M_PI / 10.0f);
+  camera.rotate_x(M_PI);
 
   // Initialisation du joueur:
-  player.translateZ(-2);
-  player.translateY(-1.0f);
+  //player.translateZ(-2);
+  //player.translateY(-1.0f);
 
   // Chargement du shader:
   shader_program_id = read_shader("shaders/shader.vert", "shaders/shader.frag");
 
   // Matrice de projection:
-  projection = matrice_projection(60.0f * M_PI / 180.0f, 1.0f, 0.01f, 50.0f);
+  projection = matrice_projection(60.0f * M_PI / 180.0f, 1.0f, 0.01f, 1000.0f);
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "projection"), 1, false, pointeur(projection));  PRINT_OPENGL_ERROR();
 
   // Activation de la gestion de la profondeur:
@@ -93,29 +99,27 @@ static void init() {
   int nCount = 10;
 
   // Ajoute les points au chemin :
-  vec3 p0 = vec3(perlinX.getNext(), perlinY.getNext(), perlinZ.getNext());
+  vec3 p0 = vec3(perlinX.getNext(), perlinY.getNext(), 0);
   path.pushPoint((p0 - p0) * 20);
   for (int i = 1; i < nCount; i++) {
-    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), perlinZ.getNext());
+    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
     path.pushPoint((p - p0) * 20);
+    counter++;
+
+    //std::cout << i << " " << (p - p0) * 20 << std::endl;
   }
 
   p00 = p0;
   
-  /**** Test Tube ****/
-  /*vec3 p1 = vec3(0, 0, 2);
-  vec3 p2 = vec3(0, 0, -20);
-  // vec3 p3 = vec3(3,0,2);
-  // vec3 p4 = vec3(5,0,2);
-  // path.setRenderRadius(1);
-  // path.setRenderRes(10);
-  path.pushPoint(p1);
-  path.pushPoint(p2);*/
-  // path.pushPoint(p3);
-  // path.setRenderRadius(2);
-  // path.pushPoint(p4);
-
   path.setRenderProgram(shader_program_id);
+
+
+
+  /** Test PathAgent **/
+
+  cube.setPointsAB(8);
+  cube.setSpeed(1);
+
 }
 
 // Fonction d'affichage:
@@ -124,25 +128,38 @@ static void display_callback() {
   glClearColor(0.5f, 0.6f, 0.9f, 1.0f);  PRINT_OPENGL_ERROR();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  PRINT_OPENGL_ERROR();
 
+  camera.setX(cube.getCoord().x);
+  camera.setY(cube.getCoord().y);
+  camera.setZ(cube.getCoord().z);
+
+  //camera.print();
+
+  /*mat3 rotation3 = mat3_rotation_from_vec3(cube.getDirection());
+  mat4 rotation4 = mat4_from_mat3(rotation3);*/
+
   // Envoie des paramètres caméra sur la carte graphique:
+  //glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(rotation4));  PRINT_OPENGL_ERROR();
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(camera.getMat4()));  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(shader_program_id, "cam_rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
-  Cube::loadCube(0.4);
+  /*Cube::loadCube(0.4);
   for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->render(shader_program_id);
-  }
+  }*/
+
+  //Cube::loadCube(0.4);
+  //cube.render(shader_program_id);
 
   // Affichage du tube:
   path.render();
 
   // Affichage du joueur:
-  Cube::loadCube(0.4);
+  /*Cube::loadCube(0.4);
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(mat4()));  PRINT_OPENGL_ERROR();
   player.render(shader_program_id);
-
+*/
   // Changement de buffer d'affichage pour eviter un effet de scintillement
   glutSwapBuffers();
 }
@@ -151,15 +168,16 @@ static void display_callback() {
 int newCubeIn = 500; // en ms
 int prevCreation = 0;
 
-// Test Perlin
-int counter = 0;
-vec3 pPrev = vec3();
+
 
 void gameUpdate() {
   // maj de la position des cubes:
-  for (unsigned int i = 0; i < cubes.size(); i++) {
+  /*for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->update();
-  }
+  }*/
+
+  if(cube.update(path_points_deleted)) cube.setPointsAB(1);
+  path_points_deleted = 0;
 
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
   if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
@@ -192,8 +210,8 @@ void gameUpdate() {
  * keyboard_callback                                                         *
 \*****************************************************************************/
 static void keyboard_callback(unsigned char key, int, int) {
-  float d_angle = 0.1f;
-  float dz = 0.5f;
+  float d_angle = 0.001f;
+  float dz = 0.1f;
 
   // Quitte le programme si on appuie sur les touches 'q', 'Q', ou 'echap'
   switch (key) {
@@ -227,14 +245,23 @@ static void keyboard_callback(unsigned char key, int, int) {
 
     // Cubes:
     case 'z':
-      for (unsigned int i = 0; i < cubes.size(); i++) {
+      camera.rotate_x(d_angle*10);
+      /*for (unsigned int i = 0; i < cubes.size(); i++) {
         cubes[i]->rotateX(d_angle * (i + 1));
-      }
+      }*/
       break;
     case 's':
-      for (unsigned int i = 0; i < cubes.size(); i++) {
+      /*for (unsigned int i = 0; i < cubes.size(); i++) {
         cubes[i]->rotateY(-d_angle * (i + 1));
-      }
+      }*/
+      if(cube.update()) std::cout << "true" << std::endl;
+      break;
+
+    case 'a':
+      cube.updateSpeed(0.1);
+      break;
+    case 'w':
+      cube.updateSpeed(-0.1);
       break;
 
     // Path:
@@ -245,6 +272,11 @@ static void keyboard_callback(unsigned char key, int, int) {
       path.updateRadius(0.01);
       break;
 
+    case 'x':
+      path.removeFirst();
+      path_points_deleted++;
+      break;
+
 
     // Perlin:
     case 'r':
@@ -252,7 +284,7 @@ static void keyboard_callback(unsigned char key, int, int) {
       vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
       std::cout << "p " << p << std::endl;
       std::cout << "dp " << p - pPrev << std::endl;
-      path.pushPoint((p - p00) * 20 + vec3(2,2,2));
+      path.pushPoint((p - p00) * 20);
 
       std::cout << std::endl;
 

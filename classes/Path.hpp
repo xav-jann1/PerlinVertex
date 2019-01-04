@@ -76,6 +76,13 @@ class Path {
   // Ré-initialisation du pré-rendu du tube:
   void resetRender();
 
+  /**
+   * Getters:
+   */
+  int getLength();     // Nombre de points composant le chemin
+  vec3 getPoint(int);  // Position d'un point du chemin
+  float getRadius();   // Rayon du tube
+
  private:
   /**
    * Chemin:

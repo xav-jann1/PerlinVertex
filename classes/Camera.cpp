@@ -35,3 +35,19 @@ void Camera::rotate_z(float theta) { m_angle_z += theta; }
 float Camera::getX() { return m_pos_x; }
 float Camera::getY() { return m_pos_y; }
 float Camera::getZ() { return m_pos_z; }
+float Camera::getAngleX() { return m_angle_x; }
+float Camera::getAngleY() { return m_angle_y; }
+float Camera::getAngleZ() { return m_angle_z; }
+
+// Setters:
+void Camera::setX(float x) { m_pos_x = x; }
+void Camera::setY(float y) { m_pos_y = y; }
+void Camera::setZ(float z) { m_pos_z = z; }
+
+// Output:
+// ostream& operator<<(ostream& os, Camera& c)
+void Camera::print() {
+  cout << getX() << '/' << getY() << '/' << getZ() << endl;
+  cout << getAngleX() << '/' << getAngleY() << '/' << getAngleZ() << endl;
+  cout << endl;
+}

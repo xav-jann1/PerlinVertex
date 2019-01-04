@@ -1,4 +1,7 @@
+// Librairie:
 #include <string>
+
+// Outil:
 #include "../tools/mat4.hpp"
 
 class Camera {
@@ -21,6 +24,17 @@ class Camera {
   float getX();
   float getY();
   float getZ();
+  float getAngleX();
+  float getAngleY();
+  float getAngleZ();
+
+  // Setters:
+  void setX(float);
+  void setY(float);
+  void setZ(float);
+
+  // Console Output:
+  void print();
 
  private:
   float m_pos_x, m_pos_y, m_pos_z;

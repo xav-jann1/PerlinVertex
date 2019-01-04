@@ -76,7 +76,5 @@ float Perlin::interpolate(float pa, float pb, float px) {
 // Génération de valeurs aléatoires:
 double Perlin::custom_rand() {
   m_Z = (m_A * m_Z + m_C) % m_M;
-  std::cout << "1: " << std::hex << m_Z << std::endl;
-
   return (double)m_Z / (double)m_M - 0.5f;
 }

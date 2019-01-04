@@ -169,7 +169,7 @@ void Path::addTubeIndices(int i) {
   /** Adaption d'indices **/
 
   // Pour corriger une erreur d'orientation des deux cercles
-  // (si les premiers indices des deux cercles ne sont pas juste en face) 
+  // (si les premiers indices des deux cercles ne sont pas juste en face)
   // il faut adapter, si nécessaire, les indices pour créer les triangles:
 
   // Calcul la distance entre les points supposés les plus proches,
@@ -180,7 +180,7 @@ void Path::addTubeIndices(int i) {
   // Pour décaler, si nécessaire les indices pour créer les triangles:
   int di = 0;
   // Si les points les plus éloignés sont en réalité les plus proches:
-  if (d2 < d1) di = m_render_res / 2;  // Décalage des indices
+  if (d2 < d1) di = m_render_res / 2 - 1;  // Décalage des indices
 
   /** Ajout des indices **/
 
@@ -223,7 +223,8 @@ void Path::resetRender() {
  * Rendu
  */
 
-// Affiche le tube à partir des points des triangles et les indices qui forment les triangles:
+// Affiche le tube à partir des points des triangles 
+// et les indices qui forment les triangles:
 void Path::render() {
   GLuint vbo, vboi = 0;
 
@@ -252,7 +253,28 @@ void Path::render() {
   glUniform4f(get_uni_loc(m_render_program, "translation"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage du tube:
-  glDrawElements(GL_TRIANGLES, m_render_indices.size() * 3, GL_UNSIGNED_INT, 0);  PRINT_OPENGL_ERROR();
+  //glDrawElements(GL_TRIANGLES, m_render_indices.size() * 3, GL_UNSIGNED_INT, 0);  PRINT_OPENGL_ERROR();
+  glDrawElements(GL_LINES, m_render_indices.size() * 3, GL_UNSIGNED_INT, 0);  PRINT_OPENGL_ERROR();
 
   return;
 }
+
+/**
+ * Getters:
+ */
+
+// Nombre de points composant le chemin:
+int Path::getLength() { return m_points.size(); }
+
+// Point du chemin:
+vec3 Path::getPoint(int n) { 
+  if(n >= 0 && n < (int)m_points.size()) 
+    return m_points[n];
+
+  // Sinon, renvoie un vecteur nul:
+  cout << "Path::getPoint() : impossible de récupérer le point " << n << endl;
+  return vec3(0,0,0);
+}
+
+// Rayon du tube:
+float Path::getRadius() { return m_render_radius; }
