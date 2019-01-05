@@ -11,6 +11,9 @@
 #include "../tools/triangle_index.hpp"
 #include "../tools/vec3.hpp"
 
+// Classe:
+#include "Perlin.hpp"
+
 /**
  * class Path: Synthèse de fonctionnement
  *  - Chemin:
@@ -45,10 +48,16 @@ class Path {
    */
 
   // Ajoute un point à la fin du chemin:
+  void addPoint();
+
+  // Ajoute un point à la liste de points:
   void pushPoint(vec3);
 
   // Supprime le premier point du chemin:
   void removeFirst();
+
+  // Met à jour les points du chemin pour être entre les distances A et B:
+  int updateBetween(float A, float B);
 
   /**
    * Méthodes pour paramètres du tube:
@@ -90,6 +99,15 @@ class Path {
 
   // Liste des points du chemin:
   std::vector<vec3> m_points;
+
+  // Générateurs de valeurs aléatoires:
+  Perlin m_perlinX, m_perlinY;  
+
+  // Premier point du chemin:
+  vec3 m_p0;
+
+  // Compte le nombre de point total du chemin:
+  int m_path_counter;
 
   // Référence au shaders utilisée lors du rendu:
   GLuint m_render_program;

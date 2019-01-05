@@ -43,7 +43,6 @@ Camera camera;
 // Chemin:
 Path path;
 Perlin perlinX, perlinY, perlinZ;  // Générateur de valeurs aléatoires
-int path_points_deleted = 0;
 vec3 p00;                          // Test Perlin
 
 // Joueur:
@@ -97,19 +96,7 @@ static void setup() {
 
   // Chemin:
   path.setRenderProgram(shader_program_id);
-
-  /**** Test Perlin ****/
-  int nCount = 10;
-
-  // Ajoute les points au chemin :
-  vec3 p0 = vec3(perlinX.getNext(), perlinY.getNext(), 0);
-  path.pushPoint((p0 - p0) * 20);
-  for (int i = 1; i < nCount; i++) {
-    vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
-    path.pushPoint((p - p0) * 20);
-    counter++;
-  }
-  p00 = p0;
+  path.updateBetween(0, 10);
 
   /** Test PathAgent **/
 
@@ -120,7 +107,9 @@ static void setup() {
   // Joueur:
   player.setRenderProgram(shader_program_id);
   player.init_model();
-  //player.setSpeed(1);
+  player.setSpeed(1);
+  player.setPointsAB(2);
+
 }
 
 /**
@@ -130,10 +119,14 @@ void update() {
 
   /** Caméra: **/
 
+  /** Chemin: **/
+  float minA = player.getPathPosition().z - 10;
+  float maxB = minA + 20;
+  int path_points_deleted = path.updateBetween(minA, maxB);
 
   /** Joueur: **/
 
-  // Déplacement du joueur <=> déplacement de la caméra:
+  // Déplacement du joueur:
   if (left == true) {
     // Déplace le joueur à gauche:
     float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
@@ -154,10 +147,10 @@ void update() {
     player.setDesiredAngle(0);
   }
 
+  // Mise à jour de la position du joueur:
   player.update(path_points_deleted);
 
   if (cube.update(path_points_deleted)) cube.setPointsAB(1);
-  path_points_deleted = 0;
 
   /** Ennemis: **/
 
@@ -171,17 +164,10 @@ void update() {
     prevCreation = glutGet(GLUT_ELAPSED_TIME);
     // cubes.push_back(generateCube());
 
-    /*** Test Perlin ***/
-    /*vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
-    std::cout << "dp " << p - pPrev << std::endl;
-    path.pushPoint((p - p00) * 20);
+  /** HitBox **/
 
-    std::cout << std::endl;
 
-    counter++;
-    pPrev = p;*/
-  }
-
+  
   /** Accélération du jeu: **/
   // todo: ...
 
@@ -215,7 +201,7 @@ void draw() {
   // Affichage du joueur:
   player.render();
 
-  // Changement de buffer d'affichage pour eviter un effet de scintillement
+  // Changement de buffer d'affichage pour éviter un effet de scintillement:
   glutSwapBuffers();
 }
 

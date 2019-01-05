@@ -136,8 +136,7 @@ void keyboard_callback(unsigned char key, int, int) {
       break;
 
     case 'x':
-      path.removeFirst();
-      path_points_deleted++;
+
       break;
 
     // Perlin:

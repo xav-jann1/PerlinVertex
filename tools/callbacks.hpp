@@ -15,9 +15,6 @@ extern Camera camera;
 extern Path path;
 extern Perlin perlinX, perlinY, perlinZ;
 
-// Variables globales:
-extern int path_points_deleted;
-
 // Fonction globale:
 extern void update();
 

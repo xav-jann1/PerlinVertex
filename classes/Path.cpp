@@ -13,6 +13,10 @@ Path::Path() {
   m_render_res = 10;
   m_render_radius = 1;
 
+  // Premier point du chemin:
+  m_p0 = vec3(m_perlinX.getNext(), m_perlinY.getNext(), 0);
+  pushPoint(m_p0);
+
   // Chargement d'un cercle de référence:
   m_render_cercle = generateCercle();
 }
@@ -21,7 +25,14 @@ Path::Path() {
  * Chemin:
  */
 
-// Ajoute un point à la liste du chemin et continue le tube:
+// Ajoute un point à la fin du chemin:
+void Path::addPoint() {
+  vec3 p = vec3(m_perlinX.getNext(), m_perlinY.getNext(), m_path_counter / 10.0f);
+  pushPoint((p - m_p0) * 20);
+  m_path_counter++;
+}
+
+// Ajoute un point à la liste de points et continue le tube:
 void Path::pushPoint(vec3 point) {
   m_points.push_back(point);
 
@@ -38,6 +49,23 @@ void Path::removeFirst() {
 
   // TODO: à optimiser, en enlevant directement les valeurs utilisé par
   //       le point dans m_render_sommets et m_render_indices
+}
+
+// Met à jour les points du chemin pour être entre les distances A et B:
+int Path::updateBetween(float minA, float maxB) {
+  // Max:
+  while (m_points.back().z < maxB ) {
+    addPoint();
+  }
+  
+  // Min:
+  int path_points_deleted = 0;
+  while (m_points.size() > 5 && m_points[0].z < minA ) {
+    removeFirst();
+    path_points_deleted++;
+  }
+
+  return path_points_deleted;
 }
 
 /**
