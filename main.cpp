@@ -50,7 +50,7 @@ Player player(&path);
 float score;
 
 // Ennemis:
-// std::vector<Cube*> cubes;
+std::vector<Cube*> cubes;
 Cube cube(&path);                  // Test PathAgent
 
 // Contrôles: (TODO: dans un struct)
@@ -67,6 +67,39 @@ mat4 projection;
 // Test Perlin
 int counter = 1;
 vec3 pPrev = vec3();
+
+
+/*****************************************************************************\
+ * Fonctions Cubes
+\*****************************************************************************/
+
+// Ajoute un cube:
+void addCube() {
+  Cube* c = new Cube(&path);
+  c->setSpeed(-2);
+  c->setAngleSpeed(0);
+  c->setRenderProgram(shader_program_id);
+  cubes.push_back(c);
+}
+
+// Supprime à cube:
+void removeCube(int i) { cubes.erase(cubes.begin() + i); }
+
+// Mise à jour des cubes:
+void updateCubes(int path_points_deleted) {
+  for (int i = (int)cubes.size() - 1; i >= 0; i--) {
+    bool canDelete = cubes[i]->update(path_points_deleted);
+    if (canDelete) removeCube(i);
+  }
+}
+
+// Affichage des cubes:
+void renderCubes() {
+  Cube::loadCube(0.4);
+  for (unsigned int i = 0; i < cubes.size(); i++) {
+    cubes[i]->render();
+  }
+}
 
 /*****************************************************************************\
  * Fonctions
@@ -110,6 +143,8 @@ static void setup() {
   player.setSpeed(1);
   player.setPointsAB(2);
 
+  // Ennemie:
+  addCube();
 }
 
 /**
@@ -154,15 +189,14 @@ void update() {
 
   /** Ennemis: **/
 
-  // maj de la position des cubes:
-  /*for (unsigned int i = 0; i < cubes.size(); i++) {
-    cubes[i]->update();
-  }*/
-
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
   if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
     prevCreation = glutGet(GLUT_ELAPSED_TIME);
-    // cubes.push_back(generateCube());
+    addCube();
+  }
+
+  // Mise à jour de la position des cubes:
+  updateCubes(path_points_deleted);
 
   /** HitBox **/
 
@@ -188,10 +222,8 @@ void draw() {
   //glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
-  /*Cube::loadCube(0.4);
-  for (unsigned int i = 0; i < cubes.size(); i++) {
-    cubes[i]->render();
-  }*/
+  renderCubes();
+
   Cube::loadCube(0.4);
   cube.render();
 

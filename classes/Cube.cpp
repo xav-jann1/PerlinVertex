@@ -14,10 +14,19 @@ using namespace std;
 // Constructeur:
 Cube::Cube(Path* path) : PathAgent(path) {
   // Paramètres du cube:
-  m_dim = 1.0f;                      // Taille
+  m_dim = 1.0f; // Taille
 
-  setSpeed(0);
+  setSpeed(-1);
+
+  // Angle aléatoire:
+  float angle = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
+  setAngle(angle);
+
   setAngleSpeed(0);
+
+  // Place la cube à la fin du chemin::
+  int position = path->getLength() - 2;
+  setPointsAB(position);
 
   // Rotations:
   m_angleX = 0.0f;
