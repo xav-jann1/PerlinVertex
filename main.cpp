@@ -26,6 +26,7 @@
 #include "classes/Cube.hpp"
 #include "classes/Path.hpp"
 #include "classes/Perlin.hpp"
+#include "classes/Player.hpp"
 
 /*****************************************************************************\
  * Variables globales
@@ -37,14 +38,21 @@ GLuint shader_program_id;
 // Caméra:
 Camera camera;
 
-// Eléments de jeu:
-// std::vector<Cube*> cubes;
-// Cube player;
+/** Eléments de jeu: **/
+
+// Chemin:
 Path path;
 Perlin perlinX, perlinY, perlinZ;  // Générateur de valeurs aléatoires
-vec3 p00;                          // Test Perlin
-Cube cube(&path);                  // Test PathAgent
 int path_points_deleted = 0;
+vec3 p00;                          // Test Perlin
+
+// Joueur:
+Player player(&path);
+float score;
+
+// Ennemis:
+// std::vector<Cube*> cubes;
+Cube cube(&path);                  // Test PathAgent
 
 // Contrôles: (TODO: dans un struct)
 bool left = false;
@@ -69,12 +77,8 @@ vec3 pPrev = vec3();
  * Initialisation des éléments du jeu:
  */
 static void setup() {
-  // Initialisation de la caméra:
-  camera.rotate_x(M_PI);
-
-  // Initialisation du joueur:
-  // player.translateZ(-2);
-  // player.translateY(-1.0f);
+   
+  /** OpenGL **/
 
   // Chargement du shader:
   shader_program_id = read_shader("shaders/shader.vert", "shaders/shader.frag");
@@ -85,6 +89,14 @@ static void setup() {
 
   // Activation de la gestion de la profondeur:
   glEnable(GL_DEPTH_TEST);  PRINT_OPENGL_ERROR();
+
+  /** Eléments de jeu: **/
+
+  // Caméra:
+  camera.rotate_x(M_PI);
+
+  // Chemin:
+  path.setRenderProgram(shader_program_id);
 
   /**** Test Perlin ****/
   int nCount = 10;
@@ -97,33 +109,62 @@ static void setup() {
     path.pushPoint((p - p0) * 20);
     counter++;
   }
-
   p00 = p0;
-
-  path.setRenderProgram(shader_program_id);
 
   /** Test PathAgent **/
 
-  cube.setPointsAB(8);
-  cube.setSpeed(1);
+  cube.setPointsAB(1);
+  //cube.setSpeed(1);
+  cube.setRenderProgram(shader_program_id);
+
+  // Joueur:
+  player.setRenderProgram(shader_program_id);
+  player.init_model();
+  //player.setSpeed(1);
 }
 
 /**
  * Mise à jour du jeu:
  */
-void gameUpdate() {
+void update() {
+
+  /** Caméra: **/
+
+
+  /** Joueur: **/
+
+  // Déplacement du joueur <=> déplacement de la caméra:
+  if (left == true) {
+    // Déplace le joueur à gauche:
+    float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
+    player.updateAngle(dL);
+
+    // Modifie l'orientation du joueur:
+    player.setDesiredAngle(-0.4f);
+  } 
+  else if (right == true) {
+    // Déplace le joueur à droite:
+    float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
+    player.updateAngle(-dL);
+
+    // Modifie l'orientation du joueur:
+    player.setDesiredAngle(0.4f);
+  }
+  else {
+    player.setDesiredAngle(0);
+  }
+
+  player.update(path_points_deleted);
+
+  if (cube.update(path_points_deleted)) cube.setPointsAB(1);
+  path_points_deleted = 0;
+
+  /** Ennemis: **/
+
   // maj de la position des cubes:
   /*for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->update();
   }*/
-
-  // Mise à jour de la position de la caméra:
-  camera.setX(cube.getPathCoord().x);
-  camera.setY(cube.getPathCoord().y);
-  camera.setZ(cube.getPathCoord().z);
-
-  if (cube.update(path_points_deleted)) cube.setPointsAB(1);
-  path_points_deleted = 0;
 
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
   if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
@@ -141,15 +182,9 @@ void gameUpdate() {
     pPrev = p;*/
   }
 
-  // Déplacement du joueur <=> déplacement de la caméra:
-  if (left == true) {
-    float dL = 0.01f;
-    camera.rotate_z(dL);
-  }
-  if (right == true) {
-    float dL = 0.01f;
-    camera.rotate_z(-dL);
-  }
+  /** Accélération du jeu: **/
+  // todo: ...
+
 }
 
 /**
@@ -160,35 +195,26 @@ void draw() {
   glClearColor(0.5f, 0.6f, 0.9f, 1.0f);  PRINT_OPENGL_ERROR();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  PRINT_OPENGL_ERROR();
 
-  camera.print();
-
-  // mat3 rotation3 = mat3_rotation_from_vec3(cube.getDirection() * -1.0f);
-  // mat4 rotation4 = mat4_from_mat3(rotation3);
-
   // Envoie des paramètres caméra sur la carte graphique:
-  // glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1,
-  // false, pointeur(rotation4));  PRINT_OPENGL_ERROR();
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(camera.getMat4()));  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(shader_program_id, "cam_rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
+  glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX() + player.getPathPosition().x, camera.getY() + player.getPathPosition().y, camera.getZ() + player.getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
+  //glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
   /*Cube::loadCube(0.4);
   for (unsigned int i = 0; i < cubes.size(); i++) {
-    cubes[i]->render(shader_program_id);
+    cubes[i]->render();
   }*/
-
   Cube::loadCube(0.4);
-  cube.render(shader_program_id);
+  cube.render();
 
   // Affichage du tube:
   path.render();
 
   // Affichage du joueur:
-  /*Cube::loadCube(0.4);
-  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false,
-  pointeur(mat4()));  PRINT_OPENGL_ERROR(); player.render(shader_program_id);
-*/
+  player.render();
+
   // Changement de buffer d'affichage pour eviter un effet de scintillement
   glutSwapBuffers();
 }

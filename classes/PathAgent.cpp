@@ -17,7 +17,7 @@ PathAgent::PathAgent(Path* path) {
   // Paramètres de l'agent:
   setAngle(0);
   setSpeed(1);
-  setAngleSpeed(1);
+  setAngleSpeed(0);
   setOffset(0);
 
   // Variables pour le déplacement de l'agent:
@@ -33,9 +33,12 @@ PathAgent::PathAgent(Path* path) {
 
 // Angle:
 void PathAgent::setAngle(float angle) {
-  // TODO: ajouter vérification <0??
-  m_path_angle = angle;
+  // Angle compris entre 0 et 2*PI:
+  m_path_angle = angle - 2 * M_PI * floor( angle / (2 * M_PI) );
 }
+
+// Modification relative de l'angle:
+void PathAgent::updateAngle(float dangle) { setAngle(m_path_angle + dangle); }
 
 // Vitesse de rotation:
 void PathAgent::setAngleSpeed(float speed) { m_angle_speed = speed; }
@@ -46,6 +49,7 @@ void PathAgent::setSpeed(float speed) { m_speed = speed; }
 // Modification relative de la vitesse de translation:
 void PathAgent::updateSpeed(float dspeed) { m_speed += dspeed; }
 
+// Adaptation de la position de l'agent sur le tube:
 void PathAgent::setOffset(float offset) { m_tube_offset = offset; }
 
 // Génère le vecteur normalisé dirigé du point A vers le point B:
@@ -67,14 +71,23 @@ void PathAgent::setPointsAB(int i) {
 }
 
 /**
- * Getter:
+ * Getters:
  */
 
 // Position de l'agent sur le tube:
-vec3 PathAgent::getPos() { return m_tube_position; }
+vec3 PathAgent::getPosition() { return m_tube_position; }
 
 // Direction:
 vec3 PathAgent::getDirection() { return m_direction; }
+
+// Path position:
+vec3 PathAgent::getPathPosition() { return m_path_position; }
+
+// Vitesse de translation:
+float PathAgent::getSpeed() { return m_speed; }
+
+// Angle:
+float PathAgent::getAngle() { return m_path_angle; }
 
 /**
  * Méthodes:
@@ -112,7 +125,7 @@ bool PathAgent::update(int path_points_deleted) {
   /** Mise à jour de la position de l'agent sur le chemin **/
 
   // Mise à jour de l'angle:
-  m_path_angle += m_angle_speed * deltaTime;
+  updateAngle(m_angle_speed * deltaTime);
 
   // Mise à jour de la position:
   m_path_position += m_speed * m_direction * deltaTime;
@@ -174,21 +187,11 @@ bool PathAgent::update(int path_points_deleted) {
   vec3 ref = vec3(1, 0, 0);
   vec3 perpandiculaire = cross(m_direction, ref);
 
-  vec3 angle_pos =
-      rotateVectorAroundAxis(perpandiculaire, m_direction, m_path_angle);
-
-  /* m_tube_position = 0;
-
-  // Position au bord du tube, sans rotation:
-  vec3 position = vec3(m_path->getRadius(), 0, 0); // TODO: ajouter offset
-
-  // Ajoute la rotation:
-  mat3 rotation_z = mat3_rotation(m_path_angle, 0.0f, 0.0f, 1.0f);
-  position = rotation_z * position;*/
+  // Rotation du vecteur autour de l'axe de la direction:
+  vec3 angle_pos = rotateVectorAroundAxis(perpandiculaire, m_direction, m_path_angle);
 
   // Ajoute la translation:
-  m_tube_position = m_path_position + normalize(angle_pos) *
-                                          (m_path->getRadius() + m_tube_offset);
+  m_tube_position = m_path_position + normalize(angle_pos) * (m_path->getRadius() + m_tube_offset);
 
   return false;
 }

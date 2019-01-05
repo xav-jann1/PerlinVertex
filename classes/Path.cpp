@@ -44,10 +44,10 @@ void Path::removeFirst() {
  * Paramètres du tube:
  */
 
-// Définit les shaders utilisés par render():
+// Shaders utilisés par render():
 void Path::setRenderProgram(GLuint program) { m_render_program = program; }
 
-// Définit la résolution du tube (= nombre de points par cercle):
+// Résolution du tube (= nombre de points par cercle):
 void Path::setRenderRes(int N) {
   m_render_res = N;
 
@@ -55,7 +55,7 @@ void Path::setRenderRes(int N) {
   resetRender();
 }
 
-// Définit le rayon du tube:
+// Rayon du tube:
 void Path::setRenderRadius(float r) {
   // Si le rayon est trop faible:
   if (r < 0.1) {

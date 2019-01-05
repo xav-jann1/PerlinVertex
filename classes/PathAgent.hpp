@@ -20,6 +20,7 @@ class PathAgent {
   void setSpeed(float);
   void updateSpeed(float);
   void setAngle(float);
+  void updateAngle(float); 
   void setAngleSpeed(float);
   void setOffset(float);
   void setPointsAB(int);
@@ -28,8 +29,11 @@ class PathAgent {
   void updateDirection();
 
   // Accès à la position et direction de l'agent:
-  vec3 getPos();
+  vec3 getPosition();
   vec3 getDirection();
+  vec3 getPathPosition();
+  float getSpeed();
+  float getAngle();
 
  private:
   // Chemin sur lequel se trouve l'agent:

@@ -37,7 +37,7 @@ vec3& vec3::operator*=(float s) {
 }
 
 vec3& vec3::operator/=(float s) {
-  assert(fabs(s) > 10e-6);
+  //assert(fabs(s) > 10e-6);
   x /= s;
   y /= s;
   z /= s;

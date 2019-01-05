@@ -17,8 +17,8 @@ void timer_callback(int) {
   // Demande de rappel de cette fonction dans 25ms:
   glutTimerFunc(25, timer_callback, 0);
 
-  // Gestion du jeu:
-  gameUpdate();
+  // Mise à jour du jeu:
+  update();
 
   // Réactualisation de l'affichage:
   glutPostRedisplay();
@@ -102,17 +102,22 @@ void keyboard_callback(unsigned char key, int, int) {
 
     // Cubes:
     case 'z':
-      camera.rotate_x(d_angle * 10);
-      /*for (unsigned int i = 0; i < cubes.size(); i++) {
-        cubes[i]->rotateX(d_angle * (i + 1));
-      }*/
+
+      break;
+
+    case 'e':
+
       break;
     case 's':
-      /*for (unsigned int i = 0; i < cubes.size(); i++) {
-        cubes[i]->rotateY(-d_angle * (i + 1));
-      }*/
-      if (cube.update()) std::cout << "true" << std::endl;
+
       break;
+    case 'd':
+
+      break;
+    case 'f':
+
+      break;
+
 
     case 'a':
       cube.updateSpeed(0.1);
@@ -120,6 +125,7 @@ void keyboard_callback(unsigned char key, int, int) {
     case 'w':
       cube.updateSpeed(-0.1);
       break;
+
 
     // Path:
     case 'b':

@@ -2,6 +2,9 @@
 #include <cmath>
 #include <cstdlib>
 
+// Outil:
+#include "mat3.hpp"
+
 // Header:
 #include "mat4.hpp"
 
@@ -122,6 +125,14 @@ mat4 matrice_zeros() {
               0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+
+mat4 mat4_from_mat3(mat3 mat) {
+  return mat4(mat(0,0), mat(1,0), mat(2,0), 0,
+              mat(0,1), mat(1,1), mat(2,1), 0,
+              mat(0,2), mat(1,2), mat(2,2), 0,
+                  0   ,     0   ,     0   , 1);
+}
+
 std::ostream& operator<<(std::ostream& sout, const mat4& m) {
   sout << m(0, 0) << "," << m(0, 1) << "," << m(0, 2) << "," << m(0, 3) << std::endl;
   sout << m(1, 0) << "," << m(1, 1) << "," << m(1, 2) << "," << m(1, 3) << std::endl;
@@ -130,3 +141,15 @@ std::ostream& operator<<(std::ostream& sout, const mat4& m) {
 
   return sout;
 }
+
+/** Applique mat4 sur un vec3 */
+vec3 operator*(const mat4& m,const vec3& p)
+{
+    vec3 r(m(0,0)*p.x+m(0,1)*p.y+m(0,2)*p.z+m(0,3),
+           m(1,0)*p.x+m(1,1)*p.y+m(1,2)*p.z+m(1,3),
+           m(2,0)*p.x+m(2,1)*p.y+m(2,2)*p.z+m(2,3));
+    r=r/(m(3,0)*p.x+m(3,1)*p.y+m(3,2)*p.z+m(3,3));
+
+    return r;
+}
+

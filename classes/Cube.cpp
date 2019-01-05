@@ -15,35 +15,32 @@ using namespace std;
 Cube::Cube(Path* path) : PathAgent(path) {
   // Paramètres du cube:
   m_dim = 1.0f;                      // Taille
-  m_coord = vec3(0.0f, 0.0f, 0.0f);  // Position
+
+  setSpeed(0);
+  setAngleSpeed(0);
 
   // Rotations:
   m_angleX = 0.0f;
   m_angleY = 0.0f;
   m_angleZ = 0.0f;
-  m_rot_center = 0.5 * vec3(m_dim, m_dim, m_dim);
+  m_rotation_center = 0.5 * vec3(m_dim, m_dim, m_dim);
 
   // Initialisation points et couleurs du cube:
-  Cube::initPoints();
-  Cube::initColors();
+  initPoints();
+  initColors();
 }
-
-vec3 Cube::getCoord() { return m_coord; }
 
 /**
  * Setters:
  */
 
-// Translations:
-void Cube::translate(vec3 t) { m_coord += t; }
-void Cube::translateX(float x) { m_coord.x += x; }
-void Cube::translateY(float y) { m_coord.y += y; }
-void Cube::translateZ(float z) { m_coord.z += z; }
-
 // Rotations:
 void Cube::rotateX(float theta) { m_angleX += theta; }
 void Cube::rotateY(float theta) { m_angleY += theta; }
 void Cube::rotateZ(float theta) { m_angleZ += theta; }
+
+// Shaders utilisés par render():
+void Cube::setRenderProgram(GLuint program) { m_render_program = program; }
 
 /**
  * Getter:
@@ -68,9 +65,6 @@ mat4 Cube::getMat4() {
 bool Cube::update(int path_points_deleted) {
   // Mise à jour de la position du cube sur le chemin:
   bool canDelete = PathAgent::update(path_points_deleted);
-
-  // Récupère la nouvelle position de l'agent: (TODO: à enlever)
-  m_coord = PathAgent::getPos();
 
   return canDelete;
 }
@@ -159,10 +153,10 @@ void Cube::loadCube(float dim) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
 }
 
-void Cube::render(GLuint shader_program_id) {
-  glUniformMatrix4fv(get_uni_loc(shader_program_id, "rotation"), 1, false, pointeur(getMat4()));  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "translation"), getCoord().x, getCoord().y, getCoord().z, 0.0f);  PRINT_OPENGL_ERROR();
+void Cube::render() {
+  glUniformMatrix4fv(get_uni_loc(m_render_program, "rotation"), 1, false, pointeur(getMat4()));  PRINT_OPENGL_ERROR();
+  glUniform4f(get_uni_loc(m_render_program, "rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
+  glUniform4f(get_uni_loc(m_render_program, "translation"), getPosition().x, getPosition().y, getPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage:
   glDrawElements(GL_TRIANGLES, 12 * 3, GL_UNSIGNED_INT, 0);  PRINT_OPENGL_ERROR();

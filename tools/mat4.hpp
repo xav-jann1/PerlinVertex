@@ -1,8 +1,11 @@
-
 #ifndef MAT4_HPP
 #define MAT4_HPP
 
+// Librairie:
 #include <iostream>
+
+// Outil:
+#include "mat3.hpp"
 
 /** Une structure de matrice de taille 4x4 */
 
@@ -28,6 +31,9 @@ struct mat4 {
 /** Produit de matrice */
 mat4 operator*(const mat4& m1, const mat4& m2);
 
+/** Applique mat4 sur un vec3 */
+vec3 operator*(const mat4& m1,const vec3& m2);
+
 /** Récupère un pointeur sur les données de la matrice */
 const float* pointeur(const mat4& m);
 
@@ -43,6 +49,9 @@ mat4 matrice_projection(float fov, float aspect, float d_min, float d_max);
 
 /** Construit une matrice n'ayant que des zéros */
 mat4 matrice_zeros();
+
+/** Converti une matrice 3x3 en matrice 4x4 */
+mat4 mat4_from_mat3(mat3);
 
 /** Affichage d'une matrice sur la ligne de commande */
 std::ostream& operator<<(std::ostream& sout, const mat4& m);

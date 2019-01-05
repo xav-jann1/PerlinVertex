@@ -6,9 +6,11 @@
 #include "../classes/Cube.hpp"
 #include "../classes/Path.hpp"
 #include "../classes/Perlin.hpp"
+#include "../classes/Player.hpp"
 
 // Objets globaux:
 extern Cube cube;
+extern Player player;
 extern Camera camera;
 extern Path path;
 extern Perlin perlinX, perlinY, perlinZ;
@@ -17,14 +19,13 @@ extern Perlin perlinX, perlinY, perlinZ;
 extern int path_points_deleted;
 
 // Fonction globale:
-extern void gameUpdate();
+extern void update();
 
 // A supprimer:
 extern int counter;
 extern vec3 pPrev;
 extern vec3 p00;
 extern bool left, right;
-extern GLuint shader_program_id;
 
 // Clavier:
 void keyboard_callback(unsigned char key, int, int);
