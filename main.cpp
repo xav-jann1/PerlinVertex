@@ -42,8 +42,6 @@ Camera camera;
 
 // Chemin:
 Path path;
-Perlin perlinX, perlinY, perlinZ;  // Générateur de valeurs aléatoires
-vec3 p00;                          // Test Perlin
 
 // Joueur:
 Player player(&path);
@@ -51,7 +49,6 @@ float score;
 
 // Ennemis:
 std::vector<Cube*> cubes;
-Cube cube(&path);                  // Test PathAgent
 
 // Contrôles: (TODO: dans un struct)
 bool left = false;
@@ -63,11 +60,6 @@ int prevCreation = 0;
 
 // Matrice de projection:
 mat4 projection;
-
-// Test Perlin
-int counter = 1;
-vec3 pPrev = vec3();
-
 
 /*****************************************************************************\
  * Fonctions Cubes
@@ -134,12 +126,6 @@ static void setup() {
   path.setRenderProgram(shader_program_id);
   path.updateBetween(0, 10);
 
-  /** Test PathAgent **/
-
-  cube.setPointsAB(1);
-  //cube.setSpeed(1);
-  cube.setRenderProgram(shader_program_id);
-
   // Joueur:
   player.setRenderProgram(shader_program_id);
   player.init_model();
@@ -188,8 +174,6 @@ void update() {
   // Mise à jour de la position du joueur:
   player.update(path_points_deleted);
 
-  if (cube.update(path_points_deleted)) cube.setPointsAB(1);
-
   /** Ennemis: **/
 
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
@@ -215,7 +199,7 @@ void update() {
     float diff_position = cube_position - player_position;
 
     // Si joueur et cube sont proches:
-    if(fabs(diff_position) < 2) {
+    if(fabs(diff_position) < 1.5) {
       // Vérifie l'angle:
       float cube_angle = cubes[i]->getAngle();
       float diff_angle = fmod(fabs(player_angle - cube_angle) + M_PI, 2 * M_PI) - M_PI;
@@ -252,9 +236,6 @@ void draw() {
 
   // Affichage des cubes:
   renderCubes();
-
-  Cube::loadCube(0.4);
-  cube.render();
 
   // Affichage du tube:
   path.render();

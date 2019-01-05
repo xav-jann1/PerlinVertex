@@ -100,33 +100,6 @@ void keyboard_callback(unsigned char key, int, int) {
       camera.translation_z(-dz);
       break;
 
-    // Cubes:
-    case 'z':
-
-      break;
-
-    case 'e':
-
-      break;
-    case 's':
-
-      break;
-    case 'd':
-
-      break;
-    case 'f':
-
-      break;
-
-
-    case 'a':
-      cube.updateSpeed(0.1);
-      break;
-    case 'w':
-      cube.updateSpeed(-0.1);
-      break;
-
-
     // Path:
     case 'b':
       path.updateRadius(-0.01);
@@ -135,22 +108,5 @@ void keyboard_callback(unsigned char key, int, int) {
       path.updateRadius(0.01);
       break;
 
-    case 'x':
-
-      break;
-
-    // Perlin:
-    case 'r':
-      /*** Test Perlin ***/
-      vec3 p = vec3(perlinX.getNext(), perlinY.getNext(), counter / 10.0f);
-      std::cout << "p " << p << std::endl;
-      std::cout << "dp " << p - pPrev << std::endl;
-      path.pushPoint((p - p00) * 20);
-
-      std::cout << std::endl;
-
-      counter++;
-      pPrev = p;
-      break;
   }
 }
