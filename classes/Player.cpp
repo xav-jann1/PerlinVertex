@@ -116,6 +116,15 @@ void Player::smoothRotation() {
   }
 }
 
+// Le joueur a été touché: perd 1 point de vie
+bool Player::hit() {
+  m_life--;
+
+  if(m_life < 1) return false;
+
+  return true;
+}
+
 /**
  * Rendu:
  */

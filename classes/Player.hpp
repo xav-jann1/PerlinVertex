@@ -25,6 +25,7 @@ class Player : public PathAgent {
   // Update:
   bool update(int path_points_deleted = 0);
   void smoothRotation();  // Animation
+  bool hit();
 
   // Affichage:
   void render();

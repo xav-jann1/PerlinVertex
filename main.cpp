@@ -95,7 +95,10 @@ void updateCubes(int path_points_deleted) {
 
 // Affichage des cubes:
 void renderCubes() {
+  // Charge le modèle du cube sur le GPU:
   Cube::loadCube(0.4);
+
+  // Affiche chaque cube:
   for (unsigned int i = 0; i < cubes.size(); i++) {
     cubes[i]->render();
   }
@@ -143,7 +146,7 @@ static void setup() {
   player.setSpeed(1);
   player.setPointsAB(2);
 
-  // Ennemie:
+  // Ennemi:
   addCube();
 }
 
@@ -155,8 +158,8 @@ void update() {
   /** Caméra: **/
 
   /** Chemin: **/
-  float minA = player.getPathPosition().z - 10;
-  float maxB = minA + 20;
+  float minA = player.getPathPosition().z - 5;
+  float maxB = player.getPathPosition().z + 20;
   int path_points_deleted = path.updateBetween(minA, maxB);
 
   /** Joueur: **/
@@ -200,8 +203,34 @@ void update() {
 
   /** HitBox **/
 
+  // Position et angle du joueur:
+  float player_position = player.getPathPosition().z;
+  float player_angle = player.getAngle();
 
-  
+  // Vérifie pour tous les cubes:
+  for (unsigned int i = 0; i < cubes.size(); i++) {
+    
+    // Ecart de position avec le joueur:
+    float cube_position = cubes[i]->getPathPosition().z;
+    float diff_position = cube_position - player_position;
+
+    // Si joueur et cube sont proches:
+    if(fabs(diff_position) < 2) {
+      // Vérifie l'angle:
+      float cube_angle = cubes[i]->getAngle();
+      float diff_angle = fmod(fabs(player_angle - cube_angle) + M_PI, 2 * M_PI) - M_PI;
+
+      // Si joueur et cube touche:
+      if(fabs(diff_angle) < 0.2) {
+        std::cout << "Touché" << std::endl;
+        bool stillAlive = player.hit();
+        if (!stillAlive) std::cout << "Game Over !" << std::endl;
+        removeCube(i);
+      }
+    }
+
+  }
+
   /** Accélération du jeu: **/
   // todo: ...
 
