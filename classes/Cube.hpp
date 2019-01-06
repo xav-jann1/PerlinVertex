@@ -28,7 +28,6 @@ class Cube : public PathAgent {
   void setRenderProgram(GLuint program);
 
   // Getters:
-  mat4 getMat4();
   float getX();
   float getY();
   float getZ();
@@ -53,6 +52,7 @@ class Cube : public PathAgent {
   // Transformation:
   vec3 m_rotation_center;
   float m_angleX, m_angleY, m_angleZ;
+  mat4 getRotationMatrix();
 
   // Rendu:
   vec3 m_points[8], m_colors[8];

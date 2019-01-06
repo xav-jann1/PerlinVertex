@@ -30,8 +30,8 @@ Cube::Cube(Path* path) : PathAgent(path) {
 
   // Rotations:
   m_angleX = 0.0f;
-  m_angleY = 0.0f;
-  m_angleZ = 0.0f;
+  m_angleY = M_PI;
+  m_angleZ = M_PI;
   m_rotation_center = 0.5 * vec3(m_dim, m_dim, m_dim);
 
   // Initialisation points et couleurs du cube:
@@ -56,12 +56,28 @@ void Cube::setRenderProgram(GLuint program) { m_render_program = program; }
  */
 
 // Matrice de rotation du cube:
-mat4 Cube::getMat4() {
-  mat4 rotation_x = matrice_rotation(m_angleX, 1.0f, 0.0f, 0.0f);
+mat4 Cube::getRotationMatrix() {
+  /*mat4 rotation_x = matrice_rotation(m_angleX, 1.0f, 0.0f, 0.0f);
   mat4 rotation_y = matrice_rotation(m_angleY, 0.0f, 1.0f, 0.0f);
   mat4 rotation_z = matrice_rotation(m_angleZ, 0.0f, 0.0f, 1.0f);
   mat4 rotation = rotation_x * rotation_y * rotation_z;
-  return rotation;
+  return rotation;*/
+
+  // Rotation en direction du centre du tube:
+  vec3 position = getPosition();
+  vec3 path_position = getPathPosition();
+  vec3 orientation = position - path_position;
+  mat3 rotation3 = mat3_rotation_from_vec3(orientation * -1);
+  mat4 rotation4 = mat4_from_mat3(rotation3);
+
+  // Offset de rotation du modèle:
+  mat4 rotation_x = matrice_rotation(m_angleX, 1.0f, 0.0f, 0.0f);
+  mat4 rotation_y = matrice_rotation(m_angleY, 0.0f, 1.0f, 0.0f);
+  mat4 rotation_z = matrice_rotation(m_angleZ, 0.0f, 0.0f, 1.0f);
+  mat4 model_offset = rotation_x * rotation_y * rotation_z;
+
+  // Ajout des rotations:
+  return rotation4 * model_offset;
 }
 
 /**
@@ -74,6 +90,9 @@ mat4 Cube::getMat4() {
 bool Cube::update(int path_points_deleted) {
   // Mise à jour de la position du cube sur le chemin:
   bool canDelete = PathAgent::update(path_points_deleted);
+
+  // Rotation du cube sur lui-même:
+  m_angleZ += 0.05f;
 
   return canDelete;
 }
@@ -163,7 +182,7 @@ void Cube::loadCube(float dim) {
 }
 
 void Cube::render() {
-  glUniformMatrix4fv(get_uni_loc(m_render_program, "rotation"), 1, false, pointeur(getMat4()));  PRINT_OPENGL_ERROR();
+  glUniformMatrix4fv(get_uni_loc(m_render_program, "rotation"), 1, false, pointeur(getRotationMatrix()));  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(m_render_program, "rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(m_render_program, "translation"), getPosition().x, getPosition().y, getPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
 
