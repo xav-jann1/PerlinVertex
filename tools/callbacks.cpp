@@ -30,11 +30,19 @@ void timer_callback(int) {
 void keyboardUp_callback(int key, int, int) {
   switch (key) {
     case GLUT_KEY_LEFT:
-      left = false;
+      inputs.left = false;
       break;
 
     case GLUT_KEY_RIGHT:
-      right = false;
+      inputs.right = false;
+      break;
+
+    case GLUT_KEY_UP:
+      inputs.up = false;
+      break;
+
+    case GLUT_KEY_DOWN:
+      inputs.down= false;
       break;
   }
 }
@@ -43,21 +51,20 @@ void keyboardUp_callback(int key, int, int) {
  * special_callback                                                          *
 \*****************************************************************************/
 void special_callback(int key, int, int) {
-  float dL = 0.03f;
   switch (key) {
-    case GLUT_KEY_UP:
-      camera.translation_y(dL);  // rotation avec la touche du haut
-      break;
-    case GLUT_KEY_DOWN:
-      camera.translation_y(-dL);  // rotation avec la touche du bas
-      break;
     case GLUT_KEY_LEFT:
-      left = true;
-      // camera.rotate_z(dL); //rotation avec la touche de gauche
+      inputs.left = true;
       break;
     case GLUT_KEY_RIGHT:
-      right = true;
-      // camera.rotate_z(-dL); //rotation avec la touche de droite
+      inputs.right = true;
+      break;
+
+    case GLUT_KEY_UP:
+      inputs.up = true;
+      break;
+
+    case GLUT_KEY_DOWN:
+      inputs.down= true;
       break;
   }
 }
@@ -67,7 +74,7 @@ void special_callback(int key, int, int) {
 \*****************************************************************************/
 void keyboard_callback(unsigned char key, int, int) {
   // float d_angle = 0.001f;
-  float d_angle = 0.01f;
+  float d_angle = 0.004f;
   float dz = 0.1f;
 
   // Quitte le programme si on appuie sur les touches 'q', 'Q', ou 'echap'
@@ -91,6 +98,13 @@ void keyboard_callback(unsigned char key, int, int) {
       break;
     case 'l':
       camera.rotate_y(-d_angle);
+      break;
+
+    case 'u':
+      camera.translation_y(d_angle);
+      break;
+    case 'h':
+      camera.translation_y(-d_angle);
       break;
 
     case 'p':

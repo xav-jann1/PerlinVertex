@@ -50,9 +50,11 @@ float score;
 // Ennemis:
 std::vector<Cube*> cubes;
 
-// Contrôles: (TODO: dans un struct)
-bool left = false;
-bool right = false;
+// Contrôles:
+struct Inputs {
+  bool left, right, up, down;
+};
+struct Inputs inputs;
 
 // Gestion des éléments du jeu:
 int newCubeIn = 500;  // en ms
@@ -124,7 +126,7 @@ static void setup() {
 
   // Chemin:
   path.setRenderProgram(shader_program_id);
-  path.updateBetween(0, 10);
+  path.updateBetween(0, 10);  // Créer tube entre z=0 et z=10;
 
   // Joueur:
   player.setRenderProgram(shader_program_id);
@@ -151,7 +153,7 @@ void update() {
   /** Joueur: **/
 
   // Déplacement du joueur:
-  if (left == true) {
+  if (inputs.left == true) {
     // Déplace le joueur à gauche:
     float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
     player.updateAngle(dL);
@@ -159,7 +161,7 @@ void update() {
     // Modifie l'orientation du joueur:
     player.setDesiredAngle(-0.4f);
   } 
-  else if (right == true) {
+  else if (inputs.right == true) {
     // Déplace le joueur à droite:
     float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
     player.updateAngle(-dL);
@@ -167,9 +169,10 @@ void update() {
     // Modifie l'orientation du joueur:
     player.setDesiredAngle(0.4f);
   }
-  else {
-    player.setDesiredAngle(0);
-  }
+  else player.setDesiredAngle(0);
+  
+  if (inputs.up== true) player.updateSpeed(0.05f);
+  if (inputs.down== true) player.updateSpeed(-0.05f);
 
   // Mise à jour de la position du joueur:
   player.update(path_points_deleted);
@@ -204,7 +207,7 @@ void update() {
       float cube_angle = cubes[i]->getAngle();
       float diff_angle = fmod(fabs(player_angle - cube_angle) + M_PI, 2 * M_PI) - M_PI;
 
-      // Si joueur et cube touche:
+      // Si joueur et cube se touche:
       if(fabs(diff_angle) < 0.2) {
         std::cout << "Touché" << std::endl;
         bool stillAlive = player.hit();

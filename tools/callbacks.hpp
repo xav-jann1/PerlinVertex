@@ -12,13 +12,15 @@
 extern Player player;
 extern Camera camera;
 extern Path path;
-extern Perlin perlinX, perlinY, perlinZ;
+
+// Variable globale:
+struct Inputs {
+  bool left, right, up, down;
+};
+extern struct Inputs inputs;
 
 // Fonction globale:
 extern void update();
-
-// A supprimer:
-extern bool left, right;
 
 // Clavier:
 void keyboard_callback(unsigned char key, int, int);
