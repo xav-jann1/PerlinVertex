@@ -103,7 +103,7 @@ mat3 mat3_rotation(float angle, float axe_x, float axe_y, float axe_z) {
 }
 
 
-mat3 mat3_rotation_from_vec3(vec3 p){
+mat3 mat3_rotation_from_vec3_z(vec3 p){
   vec3 direction = normalize(p);
   vec3 rotationZ = direction;
 
@@ -114,8 +114,22 @@ mat3 mat3_rotation_from_vec3(vec3 p){
   vec3 rotationY = normalize( cross( rotationZ, rotationX ) );
 
   mat3 rotation(rotationX.x, rotationX.y, rotationX.z, rotationY.x, rotationY.y, rotationY.z, rotationZ.x, rotationZ.y, rotationZ.z);
-  //mat3 rotation(rotationX.x, rotationY.x, rotationZ.x, rotationX.y, rotationY.y, rotationZ.y, rotationX.z, rotationY.z, rotationZ.z);
+  
+  return rotation;
+}
 
+mat3 mat3_rotation_from_vec3_y(vec3 p){
+  vec3 direction = normalize(p);
+  vec3 rotationZ = direction;
+
+  // Si pas de rotation: rotationZ == (0,1,0) --> matrice identité
+  if (rotationZ.x == 0 && rotationZ.z == 0) return mat3();
+
+  vec3 rotationX = normalize( cross( vec3( 0, 1, 0 ), rotationZ ) );
+  vec3 rotationY = normalize( cross( rotationZ, rotationX ) );
+
+  mat3 rotation(rotationX.x, rotationX.y, rotationX.z, rotationY.x, rotationY.y, rotationY.z, rotationZ.x, rotationZ.y, rotationZ.z);
+  
   return rotation;
 }
 

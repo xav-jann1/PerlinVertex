@@ -48,7 +48,7 @@ mat4 Player::getRotationMatrix() {
   vec3 position = getPosition();
   vec3 path_position = getPathPosition();
   vec3 orientation = position - path_position;
-  mat3 rotation3 = mat3_rotation_from_vec3(orientation * -1);
+  mat3 rotation3 = mat3_rotation_from_vec3_z(orientation * -1);
   mat4 rotation4 = mat4_from_mat3(rotation3);
 
   // Offset de rotation du modèle:

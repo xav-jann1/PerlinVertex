@@ -4,6 +4,9 @@
 // Outil:
 #include "../tools/mat4.hpp"
 
+// Classe:
+#include "Player.hpp"
+
 class Camera {
  public:
   // Constructeur:
@@ -20,7 +23,7 @@ class Camera {
   void rotate_z(float theta);
 
   // Getters:
-  mat4 getMat4();
+  mat4 getRotationMatrix();
   float getX();
   float getY();
   float getZ();
@@ -32,6 +35,7 @@ class Camera {
   void setX(float);
   void setY(float);
   void setZ(float);
+  void setPlayer(Player* player);
 
   // Console Output:
   void print();
@@ -39,4 +43,6 @@ class Camera {
  private:
   float m_pos_x, m_pos_y, m_pos_z;
   float m_angle_x, m_angle_y, m_angle_z;
+
+  Player* m_player;  // Référence pour placer la caméra
 };

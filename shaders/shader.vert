@@ -24,7 +24,7 @@ void main (void) {
   // Coordonn"es du sommet:
   vec4 p = rotation * (gl_Vertex - rotation_center) + rotation_center + translation;
   coordonnee_3d_locale = p.xyz;
-  p = cam_rotation * (p + cam_rotation_center) - cam_rotation_center + cam_translation;
+  p = cam_rotation * (p - cam_rotation_center) + cam_rotation_center - cam_translation;
 
   // Projection du sommet:
   p = projection * p;

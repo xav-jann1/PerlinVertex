@@ -41,7 +41,8 @@ mat3 transpose(const mat3& m);
 mat3 mat3_rotation(float angle, float axe_x, float axe_y, float axe_z);
 
 /** Matrice de rotation orienter selon un vecteur */
-mat3 mat3_rotation_from_vec3(vec3 p);
+mat3 mat3_rotation_from_vec3_y(vec3 p);
+mat3 mat3_rotation_from_vec3_z(vec3 p);
 
 /** Construit une matrice n'ayant que des zéros */
 mat3 mat3_zeros();

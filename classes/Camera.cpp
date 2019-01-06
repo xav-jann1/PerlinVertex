@@ -1,4 +1,7 @@
+// Header:
 #include "Camera.hpp"
+
+
 
 using namespace std;
 
@@ -8,17 +11,29 @@ Camera::Camera() {
   m_pos_y = 0.0f;
   m_pos_z = 0.0f;
   m_angle_x = 0.0f;
-  m_angle_y = 0.0f;
+  m_angle_y = M_PI;
   m_angle_z = 0.0f;
 }
 
 // Renvoie la matrice de rotation de la caméra:
-mat4 Camera::getMat4() {
+mat4 Camera::getRotationMatrix() {
+
+  // Rotation selon la direction de déplacement du joueur:
+  vec3 player_direction = m_player->getDirection();
+  mat3 rotation3 = mat3_rotation_from_vec3_y(player_direction * -1);
+  mat4 rotation4 = mat4_from_mat3(rotation3);
+
+  // Rotation du joueur:
+  mat4 player_rotation = matrice_rotation(-m_player->getAngle(), 0.0f, 0.0f, 1.0f);
+
+  // Rotation de la caméra:
   mat4 rotation_x = matrice_rotation(m_angle_x, 1.0f, 0.0f, 0.0f);
   mat4 rotation_y = matrice_rotation(m_angle_y, 0.0f, 1.0f, 0.0f);
   mat4 rotation_z = matrice_rotation(m_angle_z, 0.0f, 0.0f, 1.0f);
-  mat4 rotation = rotation_x * rotation_y * rotation_z;
-  return rotation;
+  mat4 model_offset = rotation_x * rotation_y * rotation_z;
+
+  // Ajout des rotations:
+  return rotation4 * player_rotation * model_offset;
 }
 
 // Translations:
@@ -43,6 +58,7 @@ float Camera::getAngleZ() { return m_angle_z; }
 void Camera::setX(float x) { m_pos_x = x; }
 void Camera::setY(float y) { m_pos_y = y; }
 void Camera::setZ(float z) { m_pos_z = z; }
+void Camera::setPlayer(Player* player) { m_player = player; }
 
 // Output:
 // ostream& operator<<(ostream& os, Camera& c)

@@ -123,6 +123,7 @@ static void setup() {
 
   // Caméra:
   camera.rotate_x(M_PI);
+  camera.setPlayer(&player);
 
   // Chemin:
   path.setRenderProgram(shader_program_id);
@@ -232,10 +233,9 @@ void draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  PRINT_OPENGL_ERROR();
 
   // Envoie des paramètres caméra sur la carte graphique:
-  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(camera.getMat4()));  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "cam_rotation_center"), 0.0f, 0.0f, 0.0f, 0.0f);  PRINT_OPENGL_ERROR();
+  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(camera.getRotationMatrix()));  PRINT_OPENGL_ERROR();
+  glUniform4f(get_uni_loc(shader_program_id, "cam_rotation_center"), camera.getX() + player.getPathPosition().x, camera.getY() + player.getPathPosition().y, camera.getZ() + player.getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
   glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX() + player.getPathPosition().x, camera.getY() + player.getPathPosition().y, camera.getZ() + player.getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
-  //glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX(), camera.getY(), camera.getZ(), 0.0f);  PRINT_OPENGL_ERROR();
 
   // Affichage des cubes:
   renderCubes();

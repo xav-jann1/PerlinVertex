@@ -127,7 +127,7 @@ vector<vec3> Path::generateCercle() {
 // Oriente les points d'un cercle selon sa normale puis les déplace dans une direction:
 vector<vec3> Path::moveCercle(vector<vec3> points, vec3 dir, vec3 normale) {
   // Matrice de rotation pour orienter correctement chaque point du cercle:
-  mat3 orient = mat3_rotation_from_vec3(normale);
+  mat3 orient = mat3_rotation_from_vec3_y(normale);
 
   // Pour chaque point:
   for (int i = 0; i < (int)points.size(); i++)
