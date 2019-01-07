@@ -22,6 +22,9 @@ class Camera {
   void rotate_y(float theta);
   void rotate_z(float theta);
 
+  // Envoie des paramètres caméra sur la carte graphique:
+  void sendDataToGPU();
+
   // Getters:
   mat4 getRotationMatrix();
   float getX();
@@ -36,6 +39,7 @@ class Camera {
   void setY(float);
   void setZ(float);
   void setPlayer(Player* player);
+  void setRenderProgram(GLuint program);
 
   // Console Output:
   void print();
@@ -45,4 +49,12 @@ class Camera {
   float m_angle_x, m_angle_y, m_angle_z;
 
   Player* m_player;  // Référence pour placer la caméra
+
+  // Rendu:
+  GLuint m_program;
+
+  // Orientation de la caméra:
+  vec3 m_direction;
+  vec3 m_desiredDirection;
+  float m_smoothness;
 };

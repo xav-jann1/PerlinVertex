@@ -134,8 +134,6 @@ void HUD_render() {
   // Affiche la barre de vie:
   glDrawArrays(GL_QUADS, 0, 4);  PRINT_OPENGL_ERROR();
 
-  // TODO: à enlever
-  glUseProgram(shader_program_id);
 }
 
 /*****************************************************************************\
@@ -165,7 +163,8 @@ static void setup() {
   // Caméra:
   camera.rotate_x(M_PI);
   camera.setPlayer(&player);
-  camera.translation_z(-2.2f);
+  camera.setRenderProgram(shader_program_id);
+  camera.translation_z(-1.5f);
 
   // Chemin:
   path.setRenderProgram(shader_program_id);
@@ -198,7 +197,7 @@ void update() {
   // Déplacement du joueur:
   if (inputs.left == true) {
     // Déplace le joueur à gauche:
-    float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
+    float dL = 0.035f * ((player.getSpeed() - 1) / 3.0f + 1);
     player.updateAngle(dL);
 
     // Modifie l'orientation du joueur:
@@ -206,7 +205,7 @@ void update() {
   } 
   else if (inputs.right == true) {
     // Déplace le joueur à droite:
-    float dL = 0.035f * ((player.getSpeed() - 1)/2 + 1);
+    float dL = 0.035f * ((player.getSpeed() - 1) / 3.0f + 1);
     player.updateAngle(-dL);
 
     // Modifie l'orientation du joueur:
@@ -234,7 +233,7 @@ void update() {
   /** HitBox **/
 
   // Position et angle du joueur:
-  float player_position = player.getPathPosition().z;
+  float player_position = player.getPathPosition().z + 0.5;
   float player_angle = player.getAngle();
 
   // Vérifie pour tous les cubes:
@@ -245,7 +244,7 @@ void update() {
     float diff_position = cube_position - player_position;
 
     // Si joueur et cube sont proches:
-    if(fabs(diff_position) < 1.5) {
+    if(fabs(diff_position) < 0.4) {
       // Vérifie l'angle:
       float cube_angle = cubes[i]->getAngle();
       float diff_angle = fmod(fabs(player_angle - cube_angle) + M_PI, 2 * M_PI) - M_PI;
@@ -279,10 +278,11 @@ void draw() {
   glClearColor(0.5f, 0.6f, 0.9f, 1.0f);  PRINT_OPENGL_ERROR();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  PRINT_OPENGL_ERROR();
 
+  // Utilise le shader de rendu du jeu:
+  glUseProgram(shader_program_id);
+
   // Envoie des paramètres caméra sur la carte graphique:
-  glUniformMatrix4fv(get_uni_loc(shader_program_id, "cam_rotation"), 1, false, pointeur(camera.getRotationMatrix()));  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "cam_rotation_center"), camera.getX() + player.getPathPosition().x, camera.getY() + player.getPathPosition().y, camera.getZ() + player.getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(shader_program_id, "cam_translation"), camera.getX() + player.getPathPosition().x, camera.getY() + player.getPathPosition().y, camera.getZ() + player.getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
+  camera.sendDataToGPU();
 
   // Affichage des cubes:
   renderCubes();
