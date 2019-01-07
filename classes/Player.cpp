@@ -19,7 +19,7 @@
 // Constructeur:
 Player::Player(Path* path) : PathAgent(path) {
   // Paramètre du joueur:
-  m_life = 3;
+  m_life = 8;
   m_angle = 0.0f;
   m_desired_angle = 0.0f;
   setSpeed(1);
@@ -37,6 +37,9 @@ Player::Player(Path* path) : PathAgent(path) {
 /**
  * Getters:
  */
+
+// Vie:
+int Player::getLife() { return m_life; }
 
 // Shaders utilisés par render():
 vec3 Player::getRotationCenter() { return m_rotation_center; }

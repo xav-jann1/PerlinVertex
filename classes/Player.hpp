@@ -13,6 +13,7 @@ class Player : public PathAgent {
   Player(Path* path);
 
   // Getters:
+  int getLife();
   mat4 getRotationMatrix();
   vec3 getRotationCenter();
 

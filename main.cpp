@@ -32,8 +32,9 @@
  * Variables globales
 \*****************************************************************************/
 
-// Identifiant du shader:
+// Identifiant des shaders:
 GLuint shader_program_id;
+GLuint shader_HUD;
 
 // Caméra:
 Camera camera;
@@ -99,6 +100,45 @@ void renderCubes() {
 }
 
 /*****************************************************************************\
+ * HUD
+\*****************************************************************************/
+
+GLuint vbo_HUD = 0;
+void HUD_render() {
+  
+  // Sommets du quadrilatère représentant la vie du joueur:
+  float sommets[] = {-0.9f, 0.9f, 0.0f,
+                     -0.9f + player.getLife() * 0.1f, 0.9f, 0.0f,
+                     -0.9f + player.getLife() * 0.1f, 0.8f, 0.0f,
+                     -0.9f, 0.8f, 0.0f};
+
+  // Chargement du shader pour le HUD:
+  glUseProgram(shader_HUD);
+
+  // Attribution d'un buffer de données (1 indique la création d'un buffer):
+  glGenBuffers(1, &vbo_HUD);  PRINT_OPENGL_ERROR();
+  // Affectation du buffer courant:
+  glBindBuffer(GL_ARRAY_BUFFER, vbo_HUD);  PRINT_OPENGL_ERROR();
+  // Copie des données des sommets sur la carte graphique:
+  glBufferData(GL_ARRAY_BUFFER, sizeof(sommets), sommets, GL_STATIC_DRAW);  PRINT_OPENGL_ERROR();
+
+  // Active l'utilisation des données de positions:
+  glEnableClientState(GL_VERTEX_ARRAY);  PRINT_OPENGL_ERROR();
+  // Indique que le buffer courant (désigné par la variable vbo) est utilisé pour les positions de sommets
+  glVertexPointer(3, GL_FLOAT, 0, 0);  PRINT_OPENGL_ERROR();
+
+  // Envoie des paramètres du HUD sur la carte graphique:
+  float translation_x = 0.0f, translation_y = 0.0f, translation_z = 0.0f;
+  glUniform4f(get_uni_loc(shader_HUD, "translation"), translation_x, translation_y, translation_z, 0.0f);  PRINT_OPENGL_ERROR();
+
+  // Affiche la barre de vie:
+  glDrawArrays(GL_QUADS, 0, 4);  PRINT_OPENGL_ERROR();
+
+  // TODO: à enlever
+  glUseProgram(shader_program_id);
+}
+
+/*****************************************************************************\
  * Fonctions
 \*****************************************************************************/
 
@@ -110,8 +150,9 @@ static void setup() {
   /** OpenGL **/
 
   // Chargement du shader:
+  shader_HUD = read_shader("shaders/shaderHUD.vert", "shaders/shaderHUD.frag");
   shader_program_id = read_shader("shaders/shader.vert", "shaders/shader.frag");
-
+  
   // Matrice de projection:
   projection = matrice_projection(60.0f * M_PI / 180.0f, 1.0f, 0.01f, 1000.0f);
   glUniformMatrix4fv(get_uni_loc(shader_program_id, "projection"), 1, false, pointeur(projection));  PRINT_OPENGL_ERROR();
@@ -124,6 +165,7 @@ static void setup() {
   // Caméra:
   camera.rotate_x(M_PI);
   camera.setPlayer(&player);
+  camera.translation_z(-2.2f);
 
   // Chemin:
   path.setRenderProgram(shader_program_id);
@@ -133,7 +175,7 @@ static void setup() {
   player.setRenderProgram(shader_program_id);
   player.init_model();
   player.setSpeed(1);
-  player.setPointsAB(2);
+  player.setPointsAB(3);
 
   // Ennemi:
   addCube();
@@ -148,7 +190,7 @@ void update() {
 
   /** Chemin: **/
   float minA = player.getPathPosition().z - 5;
-  float maxB = player.getPathPosition().z + 20;
+  float maxB = player.getPathPosition().z + 30;
   int path_points_deleted = path.updateBetween(minA, maxB);
 
   /** Joueur: **/
@@ -209,10 +251,13 @@ void update() {
       float diff_angle = fmod(fabs(player_angle - cube_angle) + M_PI, 2 * M_PI) - M_PI;
 
       // Si joueur et cube se touche:
-      if(fabs(diff_angle) < 0.2) {
+      if(fabs(diff_angle) < 0.25) {
         std::cout << "Touché" << std::endl;
         bool stillAlive = player.hit();
-        if (!stillAlive) std::cout << "Game Over !" << std::endl;
+        if (!stillAlive){
+           std::cout << "Game Over !" << std::endl;
+           std::exit(0);
+        }
         removeCube(i);
       }
     }
@@ -220,7 +265,9 @@ void update() {
   }
 
   /** Accélération du jeu: **/
-  // todo: ...
+  if (player.getSpeed() <= 5.0f){
+    player.setSpeed(player.getSpeed() + 0.0004f);
+  }
 
 }
 
@@ -245,6 +292,9 @@ void draw() {
 
   // Affichage du joueur:
   player.render();
+
+  // HUD:
+  HUD_render();
 
   // Changement de buffer d'affichage pour éviter un effet de scintillement:
   glutSwapBuffers();
