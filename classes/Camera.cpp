@@ -52,14 +52,17 @@ void Camera::rotate_z(float theta) { m_angle_z += theta; }
 
 // Envoie des paramètres caméra sur la carte graphique:
 void Camera::sendDataToGPU() {
-  //float cam_translation_x = 
   glUniformMatrix4fv(get_uni_loc(m_program, "cam_rotation"), 1, false, pointeur(getRotationMatrix()));  PRINT_OPENGL_ERROR();
-  glUniform4f(get_uni_loc(m_program, "cam_rotation_center"), getX() + m_player->getPathPosition().x, getY() + m_player->getPathPosition().y, getZ() + m_player->getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
-  //glUniform4f(get_uni_loc(m_program, "cam_translation"), getX() + m_player->getPathPosition().x, getY() + m_player->getPathPosition().y, getZ() + m_player->getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
-  float cam_translation_x = getX() + m_player->getPathPosition().x; 
+  //glUniform4f(get_uni_loc(m_program, "cam_rotation_center"), getX() + m_player->getPathPosition().x, getY() + m_player->getPathPosition().y, getZ() + m_player->getPathPosition().z, 0.0f);  PRINT_OPENGL_ERROR();
+  /*float cam_translation_x = getX() + m_player->getPathPosition().x; 
   float cam_translation_y = getY() + m_player->getPathPosition().y;
-  float cam_translation_z = getZ() + m_player->getPathPosition().z + m_player->getSpeed() / 15.0f;
-  glUniform4f(get_uni_loc(m_program, "cam_translation"), cam_translation_x, cam_translation_y, cam_translation_z , 0.0f);  PRINT_OPENGL_ERROR();
+  float cam_translation_z = getZ() + m_player->getPathPosition().z + m_player->getSpeed() / 15.0f;*/
+  vec3 cam_translation = m_player->getPathPosition();// + m_player->getDirection() * 0.010f;
+  cam_translation.x += getX();
+  cam_translation.y += getY();
+  cam_translation.z += getZ() - m_player->getSpeed() / 15.0f;
+  glUniform4f(get_uni_loc(m_program, "cam_rotation_center"), cam_translation.x, cam_translation.y, cam_translation.z, 0.0f);  PRINT_OPENGL_ERROR();
+  glUniform4f(get_uni_loc(m_program, "cam_translation"), cam_translation.x, cam_translation.y, cam_translation.z, 0.0f);  PRINT_OPENGL_ERROR();
 }
 
 // Getters:

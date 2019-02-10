@@ -37,5 +37,6 @@ format/mesh_io_off.o: modele/format/mesh_io_off.cpp modele/format/mesh_io_off.hp
 
 .PHONY: clean
 clean: 
-	rm -f *.o executable *~ 
-	rm -f */*.o executable *~ 
+	rm -f *.o executable *~
+	rm -f */*.o executable *~
+	rm -f */*/*.o executable *~

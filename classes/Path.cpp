@@ -112,8 +112,8 @@ vector<vec3> Path::generateCercle() {
   // Liste des sommets:
   vector<vec3> sommets;
 
-  // Ajoute le centre du cercle:
-  sommets.push_back(vec3(0.0f, 0.0f, 0.0f));
+  // Ajoute le centre du cercle: (pas besoin ici)
+  //sommets.push_back(vec3(0.0f, 0.0f, 0.0f)); 
 
   // Ajoute les sommets:
   for (int k = 0; k < N; ++k) {
@@ -138,7 +138,7 @@ vector<vec3> Path::moveCercle(vector<vec3> points, vec3 dir, vec3 normale) {
 }
 
 // Ajoute les sommets à la liste de sommets:
-void Path::insertSommets(vector<vec3> sommets) {
+void Path::pushSommets(vector<vec3> sommets) {
   m_render_sommets.insert(m_render_sommets.end(), sommets.begin(), sommets.end());
 }
 
@@ -160,7 +160,7 @@ void Path::addFirstRender() {
   vector<vec3> cercle = moveCercle(m_render_cercle, pos, normale);
 
   // Ajoute les points à l'ensemble de points:
-  insertSommets(cercle);
+  pushSommets(cercle);
 }
 
 // Ajoute le rendu pour créer le tube entre le point <idx> et <idx-1>:
@@ -182,19 +182,19 @@ void Path::addRender(int idx) {
   vector<vec3> cercle = moveCercle(m_render_cercle, pos, normale);
 
   // Ajoute les points à l'ensemble de points:
-  insertSommets(cercle);
+  pushSommets(cercle);
 
   // Ajoute les indices des triangles pour former le tube entre le cercle ajouté et le précédent:
-  addTubeIndices(idx);
+  pushTubeIndices(idx);
 }
 
 // Ajoute les indices pour modéliser un tube entre le point i et i-1 du chemin:
-void Path::addTubeIndices(int i) {
+void Path::pushTubeIndices(int i) {
   // Indices du premier sommet de chaque cercle:
-  int iCercle1 = (i - 1) * (m_render_res + 1) + 1;  // Indice du premier point du cercle 1 (précédent)
-  int iCercle2 = iCercle1 + m_render_res + 1;       // Indice du premier point du cercle 2 (en cours)
+  int iCercle1 = (i - 1) * (m_render_res);  // Indice du premier point du cercle 1 (précédent)
+  int iCercle2 = iCercle1 + m_render_res;       // Indice du premier point du cercle 2 (en cours)
 
-  /** Adaption d'indices **/
+  /** Adaption d'indices **/   // (Normalemment: vérification obsolète)
 
   // Pour corriger une erreur d'orientation des deux cercles
   // (si les premiers indices des deux cercles ne sont pas juste en face)

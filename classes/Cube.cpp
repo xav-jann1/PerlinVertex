@@ -31,7 +31,7 @@ Cube::Cube(Path* path) : PathAgent(path) {
   // Rotations:
   m_angleX = 0.0f;
   m_angleY = M_PI;
-  m_angleZ = M_PI;
+  m_angleZ = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
   m_rotation_center = 0.5 * vec3(m_dim, m_dim, m_dim);
 
   // Initialisation points et couleurs du cube:

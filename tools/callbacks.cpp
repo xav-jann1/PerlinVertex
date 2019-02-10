@@ -74,7 +74,7 @@ void special_callback(int key, int, int) {
 \*****************************************************************************/
 void keyboard_callback(unsigned char key, int, int) {
   // float d_angle = 0.001f;
-  float d_angle = 0.004f;
+  float d_angle = 0.01f;
   float dz = 0.1f;
 
   // Quitte le programme si on appuie sur les touches 'q', 'Q', ou 'echap'
@@ -112,6 +112,13 @@ void keyboard_callback(unsigned char key, int, int) {
       break;
     case 'm':
       camera.translation_z(-dz);
+      break;
+
+    case 'e':
+      camera.translation_x(dz);
+      break;
+    case 'd':
+      camera.translation_x(-dz);
       break;
 
     // Path:

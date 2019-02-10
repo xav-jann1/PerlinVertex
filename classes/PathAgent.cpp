@@ -185,10 +185,10 @@ bool PathAgent::update(int path_points_deleted) {
 
   // Vecteur perpandiculaire à la direction de l'agent:
   vec3 ref = vec3(1, 0, 0);
-  vec3 perpandiculaire = cross(m_direction, ref);
+  vec3 perpendiculaire = cross(m_direction, ref);
 
   // Rotation du vecteur autour de l'axe de la direction:
-  vec3 angle_pos = rotateVectorAroundAxis(perpandiculaire, m_direction, m_path_angle);
+  vec3 angle_pos = rotateVectorAroundAxis(perpendiculaire, m_direction, m_path_angle);
 
   // Ajoute la translation:
   m_tube_position = m_path_position + normalize(angle_pos) * (m_path->getRadius() + m_tube_offset);

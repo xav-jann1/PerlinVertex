@@ -146,7 +146,7 @@ class Path {
   void addFirstRender();
 
   // Ajoute les indices pour former le tube entre les points <i> et <i-1>:
-  void addTubeIndices(int i);
+  void pushTubeIndices(int i);
 
   // Création d'un cercles de N points et de rayon r sur le plan (x,y):
   std::vector<vec3> generateCercle();
@@ -157,7 +157,7 @@ class Path {
                                vec3 normale);
 
   // Ajoute des sommets à la liste de sommets:
-  void insertSommets(std::vector<vec3> vec);
+  void pushSommets(std::vector<vec3> vec);
 };
 
 #endif

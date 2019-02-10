@@ -77,7 +77,7 @@ void addCube() {
   cubes.push_back(c);
 }
 
-// Supprime à cube:
+// Supprime un cube:
 void removeCube(int i) { cubes.erase(cubes.begin() + i); }
 
 // Mise à jour des cubes:
@@ -222,7 +222,7 @@ void update() {
   /** Ennemis: **/
 
   // Création d'un nouveau cube toutes les <newCubeIn> ms:
-  if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn) {
+  if (glutGet(GLUT_ELAPSED_TIME) - prevCreation > newCubeIn / (player.getSpeed() * 0.5)) {
     prevCreation = glutGet(GLUT_ELAPSED_TIME);
     addCube();
   }

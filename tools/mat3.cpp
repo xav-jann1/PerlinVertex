@@ -122,7 +122,7 @@ mat3 mat3_rotation_from_vec3_y(vec3 p){
   vec3 direction = normalize(p);
   vec3 rotationZ = direction;
 
-  // Si pas de rotation: rotationZ == (0,1,0) --> matrice identité
+  // Si pas de rotation: rotationY == (0,1,0) --> matrice identité
   if (rotationZ.x == 0 && rotationZ.z == 0) return mat3();
 
   vec3 rotationX = normalize( cross( vec3( 0, 1, 0 ), rotationZ ) );
