@@ -7,6 +7,9 @@
 #include <ctime>
 #include <iostream>
 #include <vector>
+#include <string>
+#include <cstring>
+#include <sstream>
 
 // OpenGL:
 #define GLEW_STATIC 1
@@ -103,8 +106,34 @@ void renderCubes() {
  * HUD
 \*****************************************************************************/
 
+// Affichage du texte:
+void vBitmapOutput(float x, float y, const char *string, void *font) {
+  int len, i;  // len donne la longueur de la chaîne de caractères
+
+  glRasterPos2f(x, y);        // Positionne le premier caractère de la chaîne
+  len = (int)strlen(string);  // Calcule la longueur de la chaîne
+
+  // Affiche chaque caractère de la chaîne
+  for (i = 0; i < len; i++) glutBitmapCharacter(font, string[i]);  
+}
+
+void vStrokeOutput(GLfloat x, GLfloat y, char *string, void *font) {
+  char *p;
+
+  glPushMatrix();  // glPushMatrix et glPopMatrix sont utilisées pour
+                   // sauvegarder et restaurer les systèmes de coordonnées non
+                   // translatés
+  glTranslatef(x, y, 0);  // Positionne le premier caractère de la chaîne
+
+  // Affiche chaque caractère de la chaîne:
+  for (p = string; *p; p++) glutStrokeCharacter(font, *p);  
+  glPopMatrix();
+}
+
 GLuint vbo_HUD = 0;
 void HUD_render() {
+
+  /** Vie **/
   
   // Sommets du quadrilatère représentant la vie du joueur:
   float sommets[] = {-0.9f, 0.9f, 0.0f,
@@ -134,6 +163,13 @@ void HUD_render() {
   // Affiche la barre de vie:
   glDrawArrays(GL_QUADS, 0, 4);  PRINT_OPENGL_ERROR();
 
+  /** Score **/
+  std::ostringstream ss;
+  ss << std::ceil(score);
+  std::string str = ss.str();
+  std::string texte = "Score : " + str;
+  vBitmapOutput(0.62f, 0.82f, texte.c_str(), GLUT_BITMAP_HELVETICA_18);
+  glFlush();
 }
 
 /*****************************************************************************\
@@ -267,6 +303,9 @@ void update() {
   if (player.getSpeed() <= 5.0f){
     player.setSpeed(player.getSpeed() + 0.0004f);
   }
+
+  // Incrémentation du score:
+  score += player.getSpeed();
 
 }
 
