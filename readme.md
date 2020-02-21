@@ -21,16 +21,16 @@ $ ./executable
 ---
 ## Objectif
 
-**Survivre** le plus longtemps possible en **évitant les obstacles** qui bloquent le chemin.
+**Diriger** le vaisseau pour **survivre** le plus longtemps possible dans le tube, en **évitant** les obstacles qui bloquent son chemin.
 
-**Attention :** il n'y a que **8 vies** disponibles.
+**Attention :** le vaisseau ne possède que **8 points de vie**, et sa vitesse **augmente** progressivement.
 
 
 ## Commandes
 
 Le jeu se joue uniquement avec les **flèches du clavier** :
-- **Gauche :** Tourne le vaisseau à gauche.
-- **Droite :** Tourne le vaisseau à droite.
+- **Gauche :** Tourne le vaisseau à gauche dans le tube.
+- **Droite :** Tourne le vaisseau à droite dans le tube.
 - **Haut :** Accélère.
 - **Bas :** Ralentit.
 
